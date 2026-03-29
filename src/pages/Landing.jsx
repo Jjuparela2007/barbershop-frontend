@@ -334,92 +334,92 @@ function Barbers() {
 
 // ── Sección CTA ────────────────────────────────────────────────
 function CTA() {
+  const [current, setCurrent] = useState(0)
+
+  const slides = [
+    {
+      url: 'https://i.pinimg.com/1200x/f3/20/d1/f320d183dddef3924c501c1bcf2b2b65.jpg',
+      
+    },
+    {
+      url: 'https://i.pinimg.com/736x/58/07/d6/5807d63ae0ff7cb3ea5db7dd3d2be384.jpg',
+      
+    },
+    {
+      url: 'https://i.pinimg.com/736x/c5/56/73/c55673de28872db4706b43b6c4b73ef3.jpg',
+      
+    },
+    {
+      url: 'https://i.pinimg.com/736x/eb/57/92/eb5792fef5416130aaa4ba97d102de15.jpg',
+      
+    },
+    {
+      url: 'https://i.pinimg.com/736x/09/9a/f0/099af0eda6639c5f11f5920a81da0201.jpg',
+      
+    },
+  ]
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrent(prev => (prev + 1) % slides.length)
+    }, 3500)
+    return () => clearInterval(timer)
+  }, [])
+
   return (
     <section style={{
-      padding: '120px 5%',
-      background: 'var(--black-soft)',
-      position: 'relative', 
+      position: 'relative',
       overflow: 'hidden',
-      textAlign: 'center',
+      height: '85vh',
+      minHeight: '560px',
     }}>
-      {/* Fondo con gradiente animado */}
+
+      {/* Slides */}
+      {slides.map((slide, i) => (
+        <div key={i} style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: `url(${slide.url})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: i === current ? 1 : 0,
+          transition: 'opacity 1.2s ease-in-out',
+          zIndex: i === current ? 1 : 0,
+        }}/>
+      ))}
+
+      {/* Overlay oscuro */}
       <div style={{
-        position: 'absolute', 
-        inset: 0,
-        background: 'radial-gradient(ellipse at 30% 40%, rgba(201,168,76,0.08) 0%, transparent 60%)',
-        animation: 'pulseGradient 8s ease-in-out infinite',
-      }}/>
-      
-      {/* Círculos decorativos flotantes */}
-      <div style={{
-        position: 'absolute',
-        top: '10%',
-        left: '5%',
-        width: '300px',
-        height: '300px',
-        background: 'radial-gradient(circle, rgba(201,168,76,0.03) 0%, transparent 70%)',
-        borderRadius: '50%',
-        animation: 'float 20s ease-in-out infinite',
-      }}/>
-      
-      <div style={{
-        position: 'absolute',
-        bottom: '10%',
-        right: '5%',
-        width: '400px',
-        height: '400px',
-        background: 'radial-gradient(circle, rgba(201,168,76,0.03) 0%, transparent 70%)',
-        borderRadius: '50%',
-        animation: 'float 25s ease-in-out infinite reverse',
-      }}/>
-      
-      <div style={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: '600px',
-        height: '600px',
-        background: 'radial-gradient(circle, rgba(201,168,76,0.02) 0%, transparent 70%)',
-        borderRadius: '50%',
-        animation: 'pulse 10s ease-in-out infinite',
+        position: 'absolute', inset: 0, zIndex: 2,
+        background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.15) 100%)',
       }}/>
 
-      <div style={{ 
-        maxWidth: '800px', 
-        margin: '0 auto', 
-        position: 'relative',
-        animation: 'fadeInUp 0.8s ease-out',
+      {/* Línea vertical decorativa */}
+      <div style={{
+        position: 'absolute', left: '5%', top: '10%', bottom: '10%', zIndex: 3,
+        width: '1px',
+        background: 'linear-gradient(to bottom, transparent, var(--gold), transparent)',
+        opacity: 0.5,
+      }}/>
+
+      {/* Contenido */}
+      <div style={{
+        position: 'absolute', inset: 0, zIndex: 3,
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'flex-end',
+        padding: '0 5% 64px',
+        textAlign: 'center',
       }}>
-        {/* Badge decorativo */}
-        <div style={{
-          display: 'inline-block',
-          marginBottom: '24px',
-          padding: '8px 20px',
-          background: 'rgba(201,168,76,0.1)',
-          border: '1px solid rgba(201,168,76,0.3)',
-          borderRadius: '50px',
-          backdropFilter: 'blur(10px)',
-        }}>
-          <span style={{
-            fontSize: '0.75rem',
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            color: 'var(--gold)',
-            fontWeight: '500',
-          }}>
-            ✦ Oferta exclusiva ✦
-          </span>
-        </div>
-        
+
+       
+
         <h2 style={{
           fontFamily: 'Playfair Display, serif',
           fontSize: 'clamp(2.2rem, 5vw, 4rem)',
-          fontWeight: '700', 
+          fontWeight: '700',
           color: 'var(--white)',
-          margin: '20px 0 24px', 
+          margin: '0 0 20px',
           lineHeight: '1.2',
-          textShadow: '0 2px 20px rgba(0,0,0,0.3)',
+          textShadow: '0 2px 30px rgba(0,0,0,0.5)',
         }}>
           Tu mejor versión
           <br/>
@@ -434,124 +434,48 @@ function CTA() {
             te está esperando
           </span>
         </h2>
-        
-        <p style={{ 
-          color: 'var(--white-muted)', 
-          marginBottom: '48px', 
+
+        <p style={{
+          color: 'rgba(255,255,255,0.7)',
+          marginBottom: '40px',
           lineHeight: '1.8',
-          fontSize: 'clamp(1rem, 2vw, 1.1rem)',
-          maxWidth: '550px',
-          marginLeft: 'auto',
-          marginRight: 'auto',
+          fontSize: 'clamp(0.95rem, 2vw, 1.05rem)',
+          maxWidth: '480px',
         }}>
           Reserva tu cita en menos de 2 minutos. Sin filas, sin esperas.
-          <br/>
         </p>
-        
+
+        {/* Puntos indicadores */}
         <div style={{
-          display: 'flex',
-          gap: '20px',
-          justifyContent: 'center',
-          flexWrap: 'wrap',
+          display: 'flex', gap: '10px', marginTop: '40px',
         }}>
-          <Link to="/register">
-            <button className="btn-gold" style={{ 
-              padding: '16px 48px', 
-              fontSize: '0.9rem',
-              position: 'relative',
-              overflow: 'hidden',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 4px 20px rgba(201,168,76,0.3)',
-            }}>
-              Crear Cuenta y Reservar
-              <span style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                width: '0',
-                height: '0',
-                borderRadius: '50%',
-                background: 'rgba(255,255,255,0.3)',
-                transform: 'translate(-50%, -50%)',
-                transition: 'width 0.6s, height 0.6s',
-              }}/>
-            </button>
-          </Link>
+          {slides.map((_, i) => (
+            <div key={i} style={{
+              width: i === current ? '28px' : '8px',
+              height: '3px',
+              background: i === current ? 'var(--gold)' : 'rgba(255,255,255,0.3)',
+              transition: 'all 0.4s ease',
+              cursor: 'pointer',
+            }} onClick={() => setCurrent(i)}/>
+          ))}
         </div>
-        
-        
       </div>
-      
-      {/* Agregar estilos de animación */}
+
       <style>{`
-        @keyframes pulseGradient {
-          0%, 100% {
-            opacity: 0.5;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1.05);
-          }
-        }
-        
-        @keyframes float {
-          0%, 100% {
-            transform: translate(0, 0) scale(1);
-          }
-          33% {
-            transform: translate(20px, -20px) scale(1.1);
-          }
-          66% {
-            transform: translate(-15px, 15px) scale(0.95);
-          }
-        }
-        
-        @keyframes pulse {
-          0%, 100% {
-            opacity: 0.3;
-            transform: translate(-50%, -50%) scale(1);
-          }
-          50% {
-            opacity: 0.6;
-            transform: translate(-50%, -50%) scale(1.2);
-          }
-        }
-        
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
         @keyframes shimmer {
-          0% {
-            background-position: 0% 50%;
-          }
-          100% {
-            background-position: 200% 50%;
-          }
+          0%   { background-position: 0% 50%; }
+          100% { background-position: 200% 50%; }
         }
-        
         .btn-gold {
           position: relative;
           overflow: hidden;
           transition: all 0.3s ease;
         }
-        
         .btn-gold:hover {
           transform: translateY(-2px);
           box-shadow: 0 8px 30px rgba(201,168,76,0.4);
         }
-        
-        .btn-gold:active {
-          transform: translateY(0);
-        }
+        .btn-gold:active { transform: translateY(0); }
       `}</style>
     </section>
   )
