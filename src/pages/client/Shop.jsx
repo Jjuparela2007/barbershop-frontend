@@ -4,41 +4,34 @@ import { useAuth } from '../../context/AuthContext'
 import api from '../../services/api'
 
 const CATEGORY_LABEL = {
-  accesorios: { label: 'Accesorios',           },
-  ropa:       { label: 'Ropa',                 },
-  barberia:   { label: 'Productos Barbería',   },
+  accesorios: { label: 'Accesorios',         },
+  ropa:       { label: 'Ropa',               },
+  barberia:   { label: 'Productos Barbería', },
 }
 
 export default function Shop() {
-  const { user }                    = useAuth()
-  const [products, setProducts]     = useState([])
-  const [cart, setCart]             = useState([])
-  const [category, setCategory]     = useState('')
-  const [loading, setLoading]       = useState(true)
-  const [cartOpen, setCartOpen]     = useState(false)
-  const [ordering, setOrdering]     = useState(false)
-  const [success, setSuccess]       = useState(null)
-  const [notes, setNotes]           = useState('')
-  const navigate                    = useNavigate()
+  const { user }                = useAuth()
+  const [products, setProducts] = useState([])
+  const [cart, setCart]         = useState([])
+  const [category, setCategory] = useState('')
+  const [loading, setLoading]   = useState(true)
+  const [cartOpen, setCartOpen] = useState(false)
+  const [ordering, setOrdering] = useState(false)
+  const [success, setSuccess]   = useState(null)
+  const [notes, setNotes]       = useState('')
+  const navigate                = useNavigate()
 
   useEffect(() => {
-  api.get('/shop/products', { params: category ? { category } : {} })
-    .then(r => {
-      console.log('RESPUESTA SHOP:', r.data)
-      setProducts(r.data.data?.products || [])
-    })
-    .catch(err => {
-      console.error('ERROR SHOP:', err)
-    })
-    .finally(() => setLoading(false))
-}, [category])
+    api.get('/shop/products', { params: category ? { category } : {} })
+      .then(r => setProducts(r.data.data?.products || []))
+      .catch(err => console.error('ERROR SHOP:', err))
+      .finally(() => setLoading(false))
+  }, [category])
 
   const addToCart = (product) => {
     setCart(prev => {
       const existing = prev.find(i => i.id === product.id)
-      if (existing) {
-        return prev.map(i => i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i)
-      }
+      if (existing) return prev.map(i => i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i)
       return [...prev, { ...product, quantity: 1 }]
     })
   }
@@ -50,7 +43,7 @@ export default function Shop() {
     setCart(prev => prev.map(i => i.id === id ? { ...i, quantity: qty } : i))
   }
 
-  const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0)
+  const total      = cart.reduce((sum, i) => sum + i.price * i.quantity, 0)
   const totalItems = cart.reduce((sum, i) => sum + i.quantity, 0)
 
   const handleOrder = async () => {
@@ -69,12 +62,19 @@ export default function Shop() {
     } finally { setOrdering(false) }
   }
 
-  // Agrupar por categoría
   const grouped = products.reduce((acc, p) => {
     if (!acc[p.category]) acc[p.category] = []
     acc[p.category].push(p)
     return acc
   }, {})
+
+  const btnQty = {
+    width: '28px', height: '28px', flexShrink: 0,
+    background: 'var(--black-soft)', border: '1px solid var(--border)',
+    color: 'var(--white)', cursor: 'pointer',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontSize: '1rem', lineHeight: 1,
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--black)', paddingTop: '80px' }}>
@@ -95,23 +95,19 @@ export default function Shop() {
               </Link>
             )}
             {user?.role !== 'admin' && (
-  <button className="btn-gold" onClick={() => setCartOpen(true)} style={{ position: 'relative', overflow: 'visible' }}>
-  🛒 Carrito
-  {totalItems > 0 && (
-    <span style={{
-      position: 'absolute', top: '-8px', right: '-8px',
-      background: 'var(--gold)',
-      color: 'var(--black)',
-      width: '20px', height: '20px', borderRadius: '50%',
-      fontSize: '0.65rem', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontWeight: '700',
-      fontFamily: 'DM Sans, sans-serif',
-      border: '1.5px solid var(--black)',
-    }}>{totalItems}</span>
-  )}
-</button>
-)}
-                
+              <button className="btn-gold" onClick={() => setCartOpen(true)} style={{ position: 'relative' }}>
+                🛒 Carrito
+                {totalItems > 0 && (
+                  <span style={{
+                    position: 'absolute', top: '-8px', right: '-8px',
+                    background: '#EF4444', color: 'white',
+                    width: '20px', height: '20px', borderRadius: '50%',
+                    fontSize: '0.65rem', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontWeight: '700',
+                  }}>{totalItems}</span>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -137,7 +133,7 @@ export default function Shop() {
           </div>
         )}
 
-        {/* Filtros por categoría */}
+        {/* Filtros */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '40px', flexWrap: 'wrap' }}>
           {[{ key: '', label: 'Todo', icon: '◈' }, ...Object.entries(CATEGORY_LABEL).map(([k, v]) => ({ key: k, ...v }))].map(cat => (
             <button key={cat.key} onClick={() => setCategory(cat.key)}
@@ -164,7 +160,7 @@ export default function Shop() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '2px' }}>
                   {prods.map(p => {
-                    const inCart = cart.find(i => i.id === p.id)
+                    const inCart     = cart.find(i => i.id === p.id)
                     const outOfStock = p.stock === 0
                     return (
                       <div key={p.id} className="card-hover" style={{
@@ -172,7 +168,7 @@ export default function Shop() {
                         padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px',
                         opacity: outOfStock ? 0.5 : 1,
                       }}>
-                        {/* Imagen o placeholder */}
+                        {/* Imagen */}
                         <div style={{
                           height: '160px', background: 'var(--black-soft)',
                           border: '1px solid var(--border)',
@@ -180,13 +176,13 @@ export default function Shop() {
                           fontSize: '3rem', overflow: 'hidden',
                         }}>
                           {p.image_url ? (
-  <img src={p.image_url} alt={p.name}
-    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-    onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block' }}
-  />
-) : (
-  <span>{CATEGORY_LABEL[p.category]?.icon}</span>
-)}
+                            <img src={p.image_url} alt={p.name}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                              onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block' }}
+                            />
+                          ) : (
+                            <span>{CATEGORY_LABEL[p.category]?.icon}</span>
+                          )}
                         </div>
 
                         {/* Info */}
@@ -206,45 +202,27 @@ export default function Shop() {
 
                         {/* Precio y botón */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
-  <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.2rem', color: 'var(--gold)' }}>
-    ${Number(p.price).toLocaleString('es-CO')}
-  </div>
-  {user?.role === 'admin' ? null : outOfStock ? (
-    <span style={{ fontSize: '0.72rem', color: 'var(--white-muted)' }}>Agotado</span>
-  ) : inCart ? (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-  <button onClick={() => updateQty(item.id, item.quantity - 1)} style={{
-    width: '28px', height: '28px', flexShrink: 0,
-    background: 'var(--black-soft)', border: '1px solid var(--border)',
-    color: 'var(--white)', cursor: 'pointer',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontSize: '1rem', lineHeight: 1,
-  }}>−</button>
-  <span style={{
-    fontSize: '0.9rem', color: 'var(--gold)', fontFamily: 'Playfair Display, serif',
-    width: '28px', textAlign: 'center', flexShrink: 0,
-  }}>{item.quantity}</span>
-  <button onClick={() => updateQty(item.id, item.quantity + 1)} style={{
-    width: '28px', height: '28px', flexShrink: 0,
-    background: 'var(--black-soft)', border: '1px solid var(--border)',
-    color: 'var(--white)', cursor: 'pointer',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontSize: '1rem', lineHeight: 1,
-  }}>+</button>
-  <button onClick={() => removeFromCart(item.id)} style={{
-    width: '28px', height: '28px', flexShrink: 0,
-    background: 'none', border: '1px solid rgba(239,68,68,0.3)',
-    color: '#fc8181', cursor: 'pointer',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontSize: '0.8rem', lineHeight: 1,
-  }}>✕</button>
-</div>
-  ) : (
-    <button className="btn-gold" onClick={() => addToCart(p)} style={{ padding: '8px 16px', fontSize: '0.72rem' }}>
-      + Agregar
-    </button>
-  )}
-</div>
+                          <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.2rem', color: 'var(--gold)' }}>
+                            ${Number(p.price).toLocaleString('es-CO')}
+                          </div>
+                          {user?.role === 'admin' ? null : outOfStock ? (
+                            <span style={{ fontSize: '0.72rem', color: 'var(--white-muted)' }}>Agotado</span>
+                          ) : inCart ? (
+                            /* ✅ Usa p.id e inCart.quantity — NO item */
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <button onClick={() => updateQty(p.id, inCart.quantity - 1)} style={btnQty}>−</button>
+                              <span style={{
+                                fontSize: '0.9rem', color: 'var(--gold)', fontFamily: 'Playfair Display, serif',
+                                width: '28px', textAlign: 'center', flexShrink: 0,
+                              }}>{inCart.quantity}</span>
+                              <button onClick={() => updateQty(p.id, inCart.quantity + 1)} style={btnQty}>+</button>
+                            </div>
+                          ) : (
+                            <button className="btn-gold" onClick={() => addToCart(p)} style={{ padding: '8px 16px', fontSize: '0.72rem' }}>
+                              + Agregar
+                            </button>
+                          )}
+                        </div>
                       </div>
                     )
                   })}
@@ -294,14 +272,18 @@ export default function Shop() {
                         <div style={{ fontSize: '0.88rem', color: 'var(--white)', marginBottom: '4px' }}>{item.name}</div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--gold)' }}>${Number(item.price).toLocaleString('es-CO')} c/u</div>
                       </div>
+                      {/* ✅ Carrito lateral — usa item correctamente */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <button onClick={() => updateQty(item.id, item.quantity - 1)}
-                          style={{ width: '26px', height: '26px', background: 'var(--black-soft)', border: '1px solid var(--border)', color: 'var(--white)', cursor: 'pointer' }}>−</button>
-                        <span style={{ fontSize: '0.9rem', color: 'var(--white)', minWidth: '20px', textAlign: 'center' }}>{item.quantity}</span>
-                        <button onClick={() => updateQty(item.id, item.quantity + 1)}
-                          style={{ width: '26px', height: '26px', background: 'var(--black-soft)', border: '1px solid var(--border)', color: 'var(--white)', cursor: 'pointer' }}>+</button>
-                        <button onClick={() => removeFromCart(item.id)}
-                          style={{ width: '26px', height: '26px', background: 'none', border: '1px solid rgba(239,68,68,0.3)', color: '#fc8181', cursor: 'pointer', fontSize: '0.8rem' }}>✕</button>
+                        <button onClick={() => updateQty(item.id, item.quantity - 1)} style={btnQty}>−</button>
+                        <span style={{
+                          fontSize: '0.9rem', color: 'var(--gold)', fontFamily: 'Playfair Display, serif',
+                          width: '28px', textAlign: 'center', flexShrink: 0,
+                        }}>{item.quantity}</span>
+                        <button onClick={() => updateQty(item.id, item.quantity + 1)} style={btnQty}>+</button>
+                        <button onClick={() => removeFromCart(item.id)} style={{
+                          ...btnQty,
+                          background: 'none', border: '1px solid rgba(239,68,68,0.3)', color: '#fc8181', fontSize: '0.8rem',
+                        }}>✕</button>
                       </div>
                     </div>
                   ))}
@@ -328,18 +310,15 @@ export default function Shop() {
                     onBlur={e  => e.target.style.borderColor = 'var(--border)'}
                   />
                 </div>
-
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <span style={{ fontSize: '0.82rem', color: 'var(--white-muted)' }}>Total ({totalItems} items)</span>
                   <span style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.5rem', color: 'var(--gold)' }}>
                     ${total.toLocaleString('es-CO')}
                   </span>
                 </div>
-
                 <div style={{ fontSize: '0.72rem', color: 'var(--white-muted)', marginBottom: '16px', textAlign: 'center' }}>
                   💳 Pago presencial en caja al momento de recoger
                 </div>
-
                 {!user ? (
                   <Link to="/login">
                     <button className="btn-gold" style={{ width: '100%' }}>Iniciar sesión para pedir</button>
