@@ -22,6 +22,11 @@ export default function Profile() {
   const [msgPass, setMsgPass]   = useState('')
   const [saving,  setSaving]    = useState(false)
   const [savingP, setSavingP]   = useState(false)
+  const [showPasswords, setShowPasswords] = useState({
+    current_password: false,
+    new_password:     false,
+    confirm_password: false,
+  })
 
   const inputStyle = {
     width: '100%', padding: '14px 16px',
@@ -40,7 +45,6 @@ export default function Profile() {
         email: form.email,
         phone: form.phone,
       })
-      // Actualizar el contexto con los nuevos datos
       login(data.data.user, localStorage.getItem('token'))
       setMsgInfo('✓ Información actualizada correctamente')
     } catch (err) {
@@ -70,6 +74,19 @@ export default function Profile() {
       setMsgPass('✗ ' + (err.response?.data?.error || 'Error al cambiar contraseña'))
     } finally { setSavingP(false) }
   }
+
+  const EyeIcon = ({ visible }) => visible ? (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
+    </svg>
+  ) : (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+  )
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--black)', paddingTop: '80px' }}>
@@ -159,20 +176,42 @@ export default function Profile() {
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {[
-              { key: 'current_password', label: 'Contraseña actual',    placeholder: '••••••••' },
-              { key: 'new_password',     label: 'Nueva contraseña',      placeholder: 'Mínimo 6 caracteres' },
-              { key: 'confirm_password', label: 'Confirmar contraseña',  placeholder: '••••••••' },
+              { key: 'current_password', label: 'Contraseña actual',   placeholder: '••••••••' },
+              { key: 'new_password',     label: 'Nueva contraseña',     placeholder: 'Mínimo 6 caracteres' },
+              { key: 'confirm_password', label: 'Confirmar contraseña', placeholder: '••••••••' },
             ].map(f => (
               <div key={f.key}>
                 <label style={{ display: 'block', fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--white-muted)', marginBottom: '8px' }}>
                   {f.label}
                 </label>
-                <input type="password" value={passForm[f.key]}
-                  onChange={e => setPassForm({ ...passForm, [f.key]: e.target.value })}
-                  placeholder={f.placeholder} style={inputStyle}
-                  onFocus={e => e.target.style.borderColor = 'var(--gold)'}
-                  onBlur={e  => e.target.style.borderColor = 'var(--border)'}
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showPasswords[f.key] ? 'text' : 'password'}
+                    value={passForm[f.key]}
+                    onChange={e => setPassForm({ ...passForm, [f.key]: e.target.value })}
+                    placeholder={f.placeholder}
+                    style={{ ...inputStyle, paddingRight: '44px' }}
+                    onFocus={e => e.target.style.borderColor = 'var(--gold)'}
+                    onBlur={e  => e.target.style.borderColor = 'var(--border)'}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPasswords(prev => ({ ...prev, [f.key]: !prev[f.key] }))}
+                    style={{
+                      position: 'absolute', right: '12px', top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none', border: 'none', cursor: 'pointer',
+                      padding: '4px', color: 'var(--white-muted)', display: 'flex',
+                      alignItems: 'center', justifyContent: 'center',
+                      transition: 'color 0.2s',
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.color = 'var(--gold)'}
+                    onMouseLeave={e => e.currentTarget.style.color = 'var(--white-muted)'}
+                    aria-label={showPasswords[f.key] ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  >
+                    <EyeIcon visible={showPasswords[f.key]} />
+                  </button>
+                </div>
               </div>
             ))}
 

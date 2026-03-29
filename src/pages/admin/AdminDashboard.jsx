@@ -565,6 +565,7 @@ function SectionUsers() {
   const [saving, setSaving]     = useState(false)
   const [msg, setMsg]           = useState('')
   const [actionLoading, setActionLoading] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
 
   useEffect(() => { fetchUsers() }, [])
 
@@ -577,48 +578,49 @@ function SectionUsers() {
   }
 
   const toggleStatus = async (id, is_active, action) => {
-  let confirmMessage = ''
-  let actionMessage = ''
-  let newStatus
-  
-  if (action === 'deactivate') {
-    confirmMessage = '¿Desactivar este usuario? Podrá reactivarse más tarde y sus citas históricas se mantendrán.'
-    actionMessage = 'desactivar'
-    newStatus = false
-  } else if (action === 'reactivate') {
-    confirmMessage = '¿Reactivar este usuario? Volverá a tener acceso al sistema.'
-    actionMessage = 'reactivar'
-    newStatus = true
-  } else {
-    return
-  }
-  
-  if (!confirm(confirmMessage)) return
-  
-  try {
-    setActionLoading(true)
-    await api.patch(`/admin/users/${id}`, { is_active: newStatus })
-    setMsg(`✓ Usuario ${actionMessage}do correctamente`)
-    setTimeout(() => setMsg(''), 3000)
-    fetchUsers()
-  } catch (error) {
-    console.error(error)
-    // Manejar errores específicos del backend
-    if (error.response?.status === 400) {
-      alert(error.response?.data?.message || `No se pudo ${actionMessage} el usuario`)
-      setMsg(`✗ ${error.response?.data?.message || `No se pudo ${actionMessage} el usuario`}`)
+    let confirmMessage = ''
+    let actionMessage = ''
+    let newStatus
+
+    if (action === 'deactivate') {
+      confirmMessage = '¿Desactivar este usuario? Podrá reactivarse más tarde y sus citas históricas se mantendrán.'
+      actionMessage = 'desactivar'
+      newStatus = false
+    } else if (action === 'reactivate') {
+      confirmMessage = '¿Reactivar este usuario? Volverá a tener acceso al sistema.'
+      actionMessage = 'reactivar'
+      newStatus = true
     } else {
-      alert(`No se pudo ${actionMessage} el usuario`)
-      setMsg(`✗ No se pudo ${actionMessage} el usuario`)
+      return
     }
-    setTimeout(() => setMsg(''), 3000)
-  } finally {
-    setActionLoading(false)
+
+    if (!confirm(confirmMessage)) return
+
+    try {
+      setActionLoading(true)
+      await api.patch(`/admin/users/${id}`, { is_active: newStatus })
+      setMsg(`✓ Usuario ${actionMessage}do correctamente`)
+      setTimeout(() => setMsg(''), 3000)
+      fetchUsers()
+    } catch (error) {
+      console.error(error)
+      if (error.response?.status === 400) {
+        alert(error.response?.data?.message || `No se pudo ${actionMessage} el usuario`)
+        setMsg(`✗ ${error.response?.data?.message || `No se pudo ${actionMessage} el usuario`}`)
+      } else {
+        alert(`No se pudo ${actionMessage} el usuario`)
+        setMsg(`✗ No se pudo ${actionMessage} el usuario`)
+      }
+      setTimeout(() => setMsg(''), 3000)
+    } finally {
+      setActionLoading(false)
+    }
   }
-}
+
   const openEdit = (user) => {
     setEditing(user)
     setEditForm({ name: user.name, email: user.email, phone: user.phone || '', new_password: '', specialties: '', experience_years: 0, bio: '' })
+    setShowNewPassword(false)
     setMsg('')
     if (user.role === 'barber') {
       api.get(`/barbers/${user.id}`).then(r => {
@@ -649,19 +651,15 @@ function SectionUsers() {
   const clients    = users.filter(u => u.role === 'client')
   const barbers    = users.filter(u => u.role === 'barber')
   const filtered = (tab === 'client' ? clients : barbers)
-  .filter(u =>
-    u.name.toLowerCase().includes(search.toLowerCase())  ||
-    u.email.toLowerCase().includes(search.toLowerCase()) ||
-    (u.phone && u.phone.includes(search))
-  )
-  .sort((a, b) => {
-    // Activos primero, inactivos al final
-    if (a.is_active !== b.is_active) {
-      return a.is_active ? -1 : 1
-    }
-    // Luego ordenar por nombre alfabéticamente
-    return a.name.localeCompare(b.name)
-  })
+    .filter(u =>
+      u.name.toLowerCase().includes(search.toLowerCase())  ||
+      u.email.toLowerCase().includes(search.toLowerCase()) ||
+      (u.phone && u.phone.includes(search))
+    )
+    .sort((a, b) => {
+      if (a.is_active !== b.is_active) return a.is_active ? -1 : 1
+      return a.name.localeCompare(b.name)
+    })
 
   const inputStyle = {
     width: '100%', padding: '10px 14px',
@@ -675,7 +673,6 @@ function SectionUsers() {
       <span className="section-label">✦ Gestión</span>
       <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.8rem', color: 'var(--white)', margin: '8px 0 24px' }}>Usuarios</h2>
 
-      {/* Mensaje de estado */}
       {msg && (
         <div style={{
           marginBottom: '20px', padding: '12px 16px', fontSize: '0.85rem',
@@ -701,7 +698,7 @@ function SectionUsers() {
         ))}
       </div>
 
-      {/* Barra de búsqueda */}
+      {/* Búsqueda */}
       <div style={{ marginBottom: '24px' }}>
         <input
           placeholder={`🔍 Buscar ${tab === 'client' ? 'cliente' : 'barbero'} por nombre, correo o teléfono...`}
@@ -749,36 +746,36 @@ function SectionUsers() {
                   <div style={{ fontSize: '0.75rem', color: 'var(--white-muted)' }}>{u.email} {u.phone && `· ${u.phone}`}</div>
                 </div>
               </div>
-             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-  <div style={{
-    padding: '3px 10px',
-    background: u.is_active ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
-    border: `1px solid ${u.is_active ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`,
-    fontSize: '0.65rem', color: u.is_active ? '#6ee7b7' : '#fc8181',
-    letterSpacing: '0.1em', textTransform: 'uppercase',
-  }}>{u.is_active ? 'Activo' : 'Inactivo'}</div>
-  
-  <button onClick={() => openEdit(u)} className="btn-gold" style={{ padding: '6px 14px', fontSize: '0.7rem' }} disabled={actionLoading}>
-    Editar
-  </button>
-  
-  {u.role !== 'admin' && (
-    <button 
-      onClick={() => toggleStatus(u.id, u.is_active, u.is_active ? 'deactivate' : 'reactivate')} 
-      disabled={actionLoading}
-      style={{
-        background: 'none',
-        border: `1px solid ${u.is_active ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.3)'}`,
-        color: u.is_active ? '#fc8181' : '#6ee7b7',
-        padding: '6px 12px', fontSize: '0.68rem', cursor: actionLoading ? 'not-allowed' : 'pointer',
-        letterSpacing: '0.1em', textTransform: 'uppercase', transition: 'all 0.3s',
-        opacity: actionLoading ? 0.5 : 1,
-      }}
-    >
-      {actionLoading ? 'Procesando...' : (u.is_active ? 'Desactivar' : 'Reactivar')}
-    </button>
-  )}
-</div>
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <div style={{
+                  padding: '3px 10px',
+                  background: u.is_active ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
+                  border: `1px solid ${u.is_active ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`,
+                  fontSize: '0.65rem', color: u.is_active ? '#6ee7b7' : '#fc8181',
+                  letterSpacing: '0.1em', textTransform: 'uppercase',
+                }}>{u.is_active ? 'Activo' : 'Inactivo'}</div>
+
+                <button onClick={() => openEdit(u)} className="btn-gold" style={{ padding: '6px 14px', fontSize: '0.7rem' }} disabled={actionLoading}>
+                  Editar
+                </button>
+
+                {u.role !== 'admin' && (
+                  <button
+                    onClick={() => toggleStatus(u.id, u.is_active, u.is_active ? 'deactivate' : 'reactivate')}
+                    disabled={actionLoading}
+                    style={{
+                      background: 'none',
+                      border: `1px solid ${u.is_active ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.3)'}`,
+                      color: u.is_active ? '#fc8181' : '#6ee7b7',
+                      padding: '6px 12px', fontSize: '0.68rem', cursor: actionLoading ? 'not-allowed' : 'pointer',
+                      letterSpacing: '0.1em', textTransform: 'uppercase', transition: 'all 0.3s',
+                      opacity: actionLoading ? 0.5 : 1,
+                    }}
+                  >
+                    {actionLoading ? 'Procesando...' : (u.is_active ? 'Desactivar' : 'Reactivar')}
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -802,6 +799,7 @@ function SectionUsers() {
               </div>
               <button onClick={() => setEditing(null)} style={{ background: 'none', border: 'none', color: 'var(--white-muted)', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
             </div>
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {[
                 { key: 'name',  label: 'Nombre',   type: 'text'  },
@@ -814,6 +812,7 @@ function SectionUsers() {
                     style={inputStyle} onFocus={e => e.target.style.borderColor = 'var(--gold)'} onBlur={e => e.target.style.borderColor = 'var(--border)'} />
                 </div>
               ))}
+
               {editing.role === 'barber' && (
                 <>
                   <div style={{ height: '1px', background: 'var(--border)', margin: '4px 0' }}/>
@@ -831,13 +830,56 @@ function SectionUsers() {
                   ))}
                 </>
               )}
+
               <div style={{ height: '1px', background: 'var(--border)', margin: '4px 0' }}/>
               <p style={{ fontSize: '0.7rem', color: 'var(--gold)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Nueva contraseña (opcional)</p>
+
+              {/* Campo contraseña con ojito */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--white-muted)', marginBottom: '6px' }}>Dejar vacío para no cambiar</label>
-                <input type="password" value={editForm.new_password || ''} onChange={e => setEditForm({ ...editForm, new_password: e.target.value })}
-                  placeholder="••••••••" style={inputStyle} onFocus={e => e.target.style.borderColor = 'var(--gold)'} onBlur={e => e.target.style.borderColor = 'var(--border)'} />
+                <label style={{ display: 'block', fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--white-muted)', marginBottom: '6px' }}>
+                  Dejar vacío para no cambiar
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showNewPassword ? 'text' : 'password'}
+                    value={editForm.new_password || ''}
+                    onChange={e => setEditForm({ ...editForm, new_password: e.target.value })}
+                    placeholder="••••••••"
+                    style={{ ...inputStyle, paddingRight: '44px' }}
+                    onFocus={e => e.target.style.borderColor = 'var(--gold)'}
+                    onBlur={e  => e.target.style.borderColor = 'var(--border)'}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(prev => !prev)}
+                    style={{
+                      position: 'absolute', right: '12px', top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none', border: 'none', cursor: 'pointer',
+                      padding: '4px', color: 'var(--white-muted)', display: 'flex',
+                      alignItems: 'center', justifyContent: 'center',
+                      transition: 'color 0.2s',
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.color = 'var(--gold)'}
+                    onMouseLeave={e => e.currentTarget.style.color = 'var(--white-muted)'}
+                    aria-label={showNewPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  >
+                    {showNewPassword ? (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                        <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                        <line x1="1" y1="1" x2="23" y2="23"/>
+                      </svg>
+                    ) : (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    )}
+                  </button>
+                </div>
               </div>
+
               {msg && (
                 <div style={{
                   padding: '10px 14px', fontSize: '0.82rem',
@@ -846,6 +888,7 @@ function SectionUsers() {
                   color: msg.startsWith('✓') ? '#6ee7b7' : '#fc8181',
                 }}>{msg}</div>
               )}
+
               <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
                 <button className="btn-outline" onClick={() => setEditing(null)} style={{ flex: 1 }}>Cancelar</button>
                 <button className="btn-gold" onClick={handleSave} disabled={saving} style={{ flex: 1, opacity: saving ? 0.7 : 1 }}>
@@ -861,13 +904,13 @@ function SectionUsers() {
 }
 
 
-
 // ── Barberos ───────────────────────────────────────────────────
 function SectionBarbers() {
-  const [form, setForm]       = useState({ name: '', email: '', password: '', phone: '', specialties: '', experience_years: 0 })
-  const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState('')
-  const [error, setError]     = useState('')
+  const [form, setForm]           = useState({ name: '', email: '', password: '', phone: '', specialties: '', experience_years: 0 })
+  const [loading, setLoading]     = useState(false)
+  const [success, setSuccess]     = useState('')
+  const [error, setError]         = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleSubmit = async e => {
     e.preventDefault(); setLoading(true); setError(''); setSuccess('')
@@ -875,6 +918,7 @@ function SectionBarbers() {
       await api.post('/admin/barbers', form)
       setSuccess('Barbero creado correctamente')
       setForm({ name: '', email: '', password: '', phone: '', specialties: '', experience_years: 0 })
+      setShowPassword(false)
     } catch (err) {
       setError(err.response?.data?.error || 'Error al crear barbero')
     } finally { setLoading(false) }
@@ -895,13 +939,14 @@ function SectionBarbers() {
         {success && <div style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', padding: '12px 16px', marginBottom: '24px', fontSize: '0.85rem', color: '#6ee7b7' }}>{success}</div>}
         {error   && <div style={{ background: 'rgba(220,38,38,0.1)',  border: '1px solid rgba(220,38,38,0.3)',  padding: '12px 16px', marginBottom: '24px', fontSize: '0.85rem', color: '#fc8181' }}>{error}</div>}
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+          {/* Campos normales */}
           {[
-            { name: 'name',             label: 'Nombre completo',  type: 'text',     required: true  },
-            { name: 'email',            label: 'Correo',           type: 'email',    required: true  },
-            { name: 'password',         label: 'Contraseña',       type: 'password', required: true  },
-            { name: 'phone',            label: 'Teléfono',         type: 'tel',      required: false },
-            { name: 'specialties',      label: 'Especialidades',   type: 'text',     required: false },
-            { name: 'experience_years', label: 'Años experiencia', type: 'number',   required: false },
+            { name: 'name',             label: 'Nombre completo',  type: 'text',   required: true  },
+            { name: 'email',            label: 'Correo',           type: 'email',  required: true  },
+            { name: 'phone',            label: 'Teléfono',         type: 'tel',    required: false },
+            { name: 'specialties',      label: 'Especialidades',   type: 'text',   required: false },
+            { name: 'experience_years', label: 'Años experiencia', type: 'number', required: false },
           ].map(field => (
             <div key={field.name}>
               <label style={{ display: 'block', fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--white-muted)', marginBottom: '8px' }}>{field.label}</label>
@@ -910,6 +955,53 @@ function SectionBarbers() {
                 onFocus={e => e.target.style.borderColor = 'var(--gold)'} onBlur={e => e.target.style.borderColor = 'var(--border)'} />
             </div>
           ))}
+
+          {/* Contraseña con ojito */}
+          <div>
+            <label style={{ display: 'block', fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--white-muted)', marginBottom: '8px' }}>
+              Contraseña
+            </label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={form.password}
+                onChange={e => setForm({ ...form, password: e.target.value })}
+                required
+                style={{ ...inputStyle, paddingRight: '44px' }}
+                onFocus={e => e.target.style.borderColor = 'var(--gold)'}
+                onBlur={e  => e.target.style.borderColor = 'var(--border)'}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(prev => !prev)}
+                style={{
+                  position: 'absolute', right: '12px', top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  padding: '4px', color: 'var(--white-muted)', display: 'flex',
+                  alignItems: 'center', justifyContent: 'center',
+                  transition: 'color 0.2s',
+                }}
+                onMouseEnter={e => e.currentTarget.style.color = 'var(--gold)'}
+                onMouseLeave={e => e.currentTarget.style.color = 'var(--white-muted)'}
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {showPassword ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                  </svg>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                )}
+              </button>
+            </div>
+          </div>
+
           <button type="submit" className="btn-gold" disabled={loading} style={{ marginTop: '8px', opacity: loading ? 0.7 : 1 }}>
             {loading ? 'Creando...' : 'Crear Barbero'}
           </button>

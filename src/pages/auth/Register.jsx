@@ -3,11 +3,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
 export default function Register() {
-  const [form, setForm]       = useState({ name: '', email: '', password: '', phone: '' })
-  const [error, setError]     = useState('')
-  const [loading, setLoading] = useState(false)
-  const navigate              = useNavigate()
-  const { user, login }       = useAuth()
+  const [form, setForm]             = useState({ name: '', email: '', password: '', phone: '' })
+  const [error, setError]           = useState('')
+  const [loading, setLoading]       = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const navigate                    = useNavigate()
+  const { user, login }             = useAuth()
 
   useEffect(() => {
     if (user) navigate('/client')
@@ -16,25 +17,25 @@ export default function Register() {
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value })
 
   const handleSubmit = async e => {
-  e.preventDefault()
-  setError('')
-  setLoading(true)
-  try {
-    const BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'
-    const res  = await fetch(`${BASE}/api/auth/register`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(form),
-    })
-    const data = await res.json()
-    if (!data.success) { setError(data.error); return }
-    navigate('/login')
-  } catch {
-    setError('Error de conexión con el servidor')
-  } finally {
-    setLoading(false)
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    try {
+      const BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'
+      const res  = await fetch(`${BASE}/api/auth/register`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(form),
+      })
+      const data = await res.json()
+      if (!data.success) { setError(data.error); return }
+      navigate('/login')
+    } catch {
+      setError('Error de conexión con el servidor')
+    } finally {
+      setLoading(false)
+    }
   }
-}
 
   const inputStyle = {
     width: '100%', padding: '14px 16px',
@@ -53,10 +54,9 @@ export default function Register() {
   }
 
   const fields = [
-    { name: 'name',     label: 'Nombre completo',    type: 'text',     placeholder: 'Juan García',       required: true  },
-    { name: 'email',    label: 'Correo electrónico', type: 'email',    placeholder: 'tu@email.com',      required: true  },
-    { name: 'password', label: 'Contraseña',         type: 'password', placeholder: '••••••••',          required: true  },
-    { name: 'phone',    label: 'Teléfono (opcional)', type: 'tel',     placeholder: '+57 300 123 4567',  required: false },
+    { name: 'name',  label: 'Nombre completo',    type: 'text',  placeholder: 'Juan García',      required: true  },
+    { name: 'email', label: 'Correo electrónico', type: 'email', placeholder: 'tu@email.com',     required: true  },
+    { name: 'phone', label: 'Teléfono (opcional)', type: 'tel',  placeholder: '+57 300 123 4567', required: false },
   ]
 
   return (
@@ -128,6 +128,8 @@ export default function Register() {
           )}
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+            {/* Campos normales */}
             {fields.map(field => (
               <div key={field.name}>
                 <label style={labelStyle}>{field.label}</label>
@@ -144,6 +146,52 @@ export default function Register() {
                 />
               </div>
             ))}
+
+            {/* Contraseña con ojito */}
+            <div>
+              <label style={labelStyle}>Contraseña</label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  required
+                  placeholder="••••••••"
+                  style={{ ...inputStyle, paddingRight: '44px' }}
+                  onFocus={e => e.target.style.borderColor = 'var(--gold)'}
+                  onBlur={e  => e.target.style.borderColor = 'rgba(201,168,76,0.3)'}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(prev => !prev)}
+                  style={{
+                    position: 'absolute', right: '12px', top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    padding: '4px', color: '#999', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.color = 'var(--gold)'}
+                  onMouseLeave={e => e.currentTarget.style.color = '#999'}
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                >
+                  {showPassword ? (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                  ) : (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
 
             <button type="submit" className="btn-gold" disabled={loading}
               style={{ width: '100%', marginTop: '8px', opacity: loading ? 0.7 : 1 }}>
