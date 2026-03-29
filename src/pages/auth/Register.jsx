@@ -20,14 +20,14 @@ export default function Register() {
   setError('')
   setLoading(true)
   try {
-    const res  = await fetch('http://localhost:3001/api/auth/register', {
+    const BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'
+    const res  = await fetch(`${BASE}/api/auth/register`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify(form),
     })
     const data = await res.json()
     if (!data.success) { setError(data.error); return }
-    // No llamar login() aquí — solo redirigir a login
     navigate('/login')
   } catch {
     setError('Error de conexión con el servidor')

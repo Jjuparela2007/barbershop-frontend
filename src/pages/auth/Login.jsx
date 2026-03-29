@@ -24,31 +24,32 @@ export default function Login() {
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value })
 
   const handleSubmit = async e => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
-    try {
-      const res  = await fetch('http://localhost:3001/api/auth/login', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(form),
-      })
-      const data = await res.json()
-      if (!data.success) { setError(data.error); return }
-      login(data.data.user, data.data.token)
-      const { role } = data.data.user
-      if (role === 'admin')       navigate('/admin')
-else if (role === 'barber') navigate('/barber')
-else {
-  const preselected = localStorage.getItem('preselected_barber')
-  navigate(preselected ? '/client/book' : '/client')
-}                        navigate('/client')
-    } catch {
-      setError('Error de conexión con el servidor')
-    } finally {
-      setLoading(false)
+  e.preventDefault()
+  setError('')
+  setLoading(true)
+  try {
+    const BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'
+    const res  = await fetch(`${BASE}/api/auth/login`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(form),
+    })
+    const data = await res.json()
+    if (!data.success) { setError(data.error); return }
+    login(data.data.user, data.data.token)
+    const { role } = data.data.user
+    if (role === 'admin')       navigate('/admin')
+    else if (role === 'barber') navigate('/barber')
+    else {
+      const preselected = localStorage.getItem('preselected_barber')
+      navigate(preselected ? '/client/book' : '/client')
     }
+  } catch {
+    setError('Error de conexión con el servidor')
+  } finally {
+    setLoading(false)
   }
+}
 
   const inputStyle = {
     width: '100%', padding: '14px 16px',

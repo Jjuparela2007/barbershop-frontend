@@ -239,11 +239,12 @@ function Barbers() {
   const [barbers, setBarbers] = useState([])
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/barbers')
-      .then(r => r.json())
-      .then(data => setBarbers(data.data.barbers))
-      .catch(err => console.error(err))
-  }, [])
+  const BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'
+  fetch(`${BASE}/api/barbers`)
+    .then(r => r.json())
+    .then(data => setBarbers(data.data.barbers))
+    .catch(err => console.error(err))
+}, [])
 
   return (
     <section id="barberos" style={{ padding: '120px 5%', background: 'var(--black)' }}>

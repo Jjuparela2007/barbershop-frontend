@@ -8,15 +8,16 @@ export default function BarberProfile() {
   const [loading, setLoading]   = useState(true)
 
   useEffect(() => {
-    Promise.all([
-      fetch(`http://localhost:3001/api/barbers/${id}`).then(r => r.json()),
-      fetch('http://localhost:3001/api/services').then(r => r.json()),
-    ]).then(([barberData, servicesData]) => {
-      setBarber(barberData.data.barber)
-      setServices(servicesData.data.services)
-    }).catch(console.error)
-    .finally(() => setLoading(false))
-  }, [id])
+  const BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'
+  Promise.all([
+    fetch(`${BASE}/api/barbers/${id}`).then(r => r.json()),
+    fetch(`${BASE}/api/services`).then(r => r.json()),
+  ]).then(([barberData, servicesData]) => {
+    setBarber(barberData.data.barber)
+    setServices(servicesData.data.services)
+  }).catch(console.error)
+  .finally(() => setLoading(false))
+}, [id])
 
   const DAYS = { 1: 'Lunes', 2: 'Martes', 3: 'Miércoles', 4: 'Jueves', 5: 'Viernes', 6: 'Sábado', 7: 'Domingo' }
 
