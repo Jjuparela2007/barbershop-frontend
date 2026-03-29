@@ -213,12 +213,32 @@ export default function Shop() {
     <span style={{ fontSize: '0.72rem', color: 'var(--white-muted)' }}>Agotado</span>
   ) : inCart ? (
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-      <button onClick={() => updateQty(p.id, inCart.quantity - 1)}
-        style={{ width: '28px', height: '28px', background: 'var(--black-soft)', border: '1px solid var(--border)', color: 'var(--white)', cursor: 'pointer', fontSize: '1rem' }}>−</button>
-      <span style={{ fontSize: '0.9rem', color: 'var(--gold)', minWidth: '20px', textAlign: 'center' }}>{inCart.quantity}</span>
-      <button onClick={() => updateQty(p.id, inCart.quantity + 1)}
-        style={{ width: '28px', height: '28px', background: 'var(--black-soft)', border: '1px solid var(--border)', color: 'var(--white)', cursor: 'pointer', fontSize: '1rem' }}>+</button>
-    </div>
+  <button onClick={() => updateQty(item.id, item.quantity - 1)} style={{
+    width: '28px', height: '28px', flexShrink: 0,
+    background: 'var(--black-soft)', border: '1px solid var(--border)',
+    color: 'var(--white)', cursor: 'pointer',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontSize: '1rem', lineHeight: 1,
+  }}>−</button>
+  <span style={{
+    fontSize: '0.9rem', color: 'var(--gold)', fontFamily: 'Playfair Display, serif',
+    width: '28px', textAlign: 'center', flexShrink: 0,
+  }}>{item.quantity}</span>
+  <button onClick={() => updateQty(item.id, item.quantity + 1)} style={{
+    width: '28px', height: '28px', flexShrink: 0,
+    background: 'var(--black-soft)', border: '1px solid var(--border)',
+    color: 'var(--white)', cursor: 'pointer',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontSize: '1rem', lineHeight: 1,
+  }}>+</button>
+  <button onClick={() => removeFromCart(item.id)} style={{
+    width: '28px', height: '28px', flexShrink: 0,
+    background: 'none', border: '1px solid rgba(239,68,68,0.3)',
+    color: '#fc8181', cursor: 'pointer',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontSize: '0.8rem', lineHeight: 1,
+  }}>✕</button>
+</div>
   ) : (
     <button className="btn-gold" onClick={() => addToCart(p)} style={{ padding: '8px 16px', fontSize: '0.72rem' }}>
       + Agregar
