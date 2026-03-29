@@ -95,18 +95,23 @@ export default function Shop() {
               </Link>
             )}
             {user?.role !== 'admin' && (
-              <button className="btn-gold" onClick={() => setCartOpen(true)} style={{ position: 'relative' }}>
-                🛒 Carrito
-                {totalItems > 0 && (
-                  <span style={{
-                    position: 'absolute', top: '-8px', right: '-8px',
-                    background: '#EF4444', color: 'white',
-                    width: '20px', height: '20px', borderRadius: '50%',
-                    fontSize: '0.65rem', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontWeight: '700',
-                  }}>{totalItems}</span>
-                )}
-              </button>
+              <button
+  className="btn-gold"
+  onClick={() => setCartOpen(true)}
+  style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+>
+  🛒 Carrito
+  {totalItems > 0 && (
+    <span style={{
+      background: 'rgba(0,0,0,0.3)',
+      color: 'var(--white)',
+      width: '20px', height: '20px', borderRadius: '50%',
+      fontSize: '0.65rem', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontWeight: '700',
+      fontFamily: 'DM Sans, sans-serif',
+    }}>{totalItems}</span>
+  )}
+</button>
             )}
           </div>
         </div>
