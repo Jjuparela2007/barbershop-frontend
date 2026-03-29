@@ -1512,7 +1512,7 @@ const [catFilter, setCatFilter] = useState('')
                   }}>
                     {p.image_url
                       ? <img src={p.image_url} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
-                      : (cat === 'accesorios' ? '⌚' : cat === 'ropa' ? '👕' : '✂')
+                      : (cat === 'accesorios' ? '' : cat === 'ropa' ? '' : '')
                     }
                   </div>
                   <div>
@@ -1598,7 +1598,7 @@ const [catFilter, setCatFilter] = useState('')
                 style={{ ...inputStyle, cursor: 'pointer' }}>
                 <option value="accesorios">Accesorios</option>
                 <option value="ropa">Ropa</option>
-                <option value="barberia">Productos Barbería</option>
+                <option value="barberia">Cuidado Personal</option>
               </select>
             </div>
             <button type="submit" className="btn-gold" disabled={saving} style={{ marginTop: '8px', opacity: saving ? 0.7 : 1 }}>
