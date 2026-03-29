@@ -22,10 +22,16 @@ export default function Shop() {
   const navigate                    = useNavigate()
 
   useEffect(() => {
-    api.get('/shop/products', { params: category ? { category } : {} })
-      .then(r => setProducts(r.data.data.products))
-      .finally(() => setLoading(false))
-  }, [category])
+  api.get('/shop/products', { params: category ? { category } : {} })
+    .then(r => {
+      console.log('RESPUESTA SHOP:', r.data)
+      setProducts(r.data.data?.products || [])
+    })
+    .catch(err => {
+      console.error('ERROR SHOP:', err)
+    })
+    .finally(() => setLoading(false))
+}, [category])
 
   const addToCart = (product) => {
     setCart(prev => {
