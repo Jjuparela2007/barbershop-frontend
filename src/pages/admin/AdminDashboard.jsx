@@ -1705,7 +1705,7 @@ const [catFilter, setCatFilter] = useState('')
                   style={{ ...inputStyle, cursor: 'pointer' }}>
                   <option value="accesorios">Accesorios</option>
                   <option value="ropa">Ropa</option>
-                  <option value="barberia">Productos Barbería</option>
+                  <option value="barberia">Cuidado Personal</option>
                 </select>
               </div>
 

@@ -6,7 +6,7 @@ import api from '../../services/api'
 const CATEGORY_LABEL = {
   accesorios: { label: 'Accesorios',         },
   ropa:       { label: 'Ropa',               },
-  barberia:   { label: 'Productos Barbería', },
+  barberia:   { label: 'Cuidado Personal', },
 }
 
 export default function Shop() {
