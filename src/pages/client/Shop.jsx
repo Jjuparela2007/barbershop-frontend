@@ -202,8 +202,8 @@ export default function Shop() {
 
                         {/* Stock */}
                         <div style={{ fontSize: '0.68rem', color: p.stock < 5 ? '#F59E0B' : 'var(--white-muted)', letterSpacing: '0.05em' }}>
-                          {outOfStock ? '✕ Sin stock' : `${p.stock} disponibles`}
-                        </div>
+  {outOfStock ? '✕ Sin stock' : user?.role === 'admin' ? `${p.stock} disponibles` : null}
+</div>
 
                         {/* Precio y botón */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
