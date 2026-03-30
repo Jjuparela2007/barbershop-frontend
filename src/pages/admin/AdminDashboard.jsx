@@ -1346,7 +1346,7 @@ function SectionShop() {
   const [editSaving,  setEditSaving]  = useState(false)
   const [editMsg,     setEditMsg]     = useState('')
   const [search,    setSearch]    = useState('')
-const [catFilter, setCatFilter] = useState('')
+  const [catFilter, setCatFilter] = useState('')
 
   useEffect(() => {
     api.get('/shop/products').then(r => setProducts(r.data.data.products))
@@ -1415,11 +1415,15 @@ const [catFilter, setCatFilter] = useState('')
     color: 'var(--white)', fontSize: '0.85rem', outline: 'none',
     fontFamily: 'DM Sans, sans-serif', boxSizing: 'border-box', transition: 'border-color 0.3s',
   }
+
   const filteredProducts = products.filter(p => {
-  const matchCat    = catFilter === '' || p.category === catFilter
-  const matchSearch = p.name.toLowerCase().includes(search.toLowerCase())
-  return matchCat && matchSearch
-})
+    const matchCat    = catFilter === '' || p.category === catFilter
+    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase())
+    return matchCat && matchSearch
+  })
+
+  const outOfStock = products.filter(p => p.stock === 0)
+
   return (
     <div>
       <span className="section-label">✦ Tienda</span>
@@ -1444,124 +1448,153 @@ const [catFilter, setCatFilter] = useState('')
         ))}
       </div>
 
-      {tab === 'products' && (
-  <div>
-    {/* Búsqueda y filtros */}
-    <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
-      <input
-        placeholder="🔍 Buscar producto..."
-        value={search} onChange={e => setSearch(e.target.value)}
-        style={{
-          flex: 1, minWidth: '200px', padding: '10px 16px',
-          background: 'var(--black)', border: '1px solid var(--border)',
-          color: 'var(--white)', fontSize: '0.85rem', outline: 'none',
-          fontFamily: 'DM Sans, sans-serif',
-        }}
-        onFocus={e => e.target.style.borderColor = 'var(--gold)'}
-        onBlur={e  => e.target.style.borderColor = 'var(--border)'}
-      />
-      {['', 'accesorios', 'ropa', 'barberia'].map(cat => (
-        <button key={cat} onClick={() => setCatFilter(cat)}
-          className={catFilter === cat ? 'btn-gold' : 'btn-outline'}
-          style={{ padding: '8px 16px', fontSize: '0.72rem' }}>
-          {cat === '' ? 'Todos' : cat === 'accesorios' ? '⌚ Accesorios' : cat === 'ropa' ? '👕 Ropa' : '✂ Barbería'}
-        </button>
-      ))}
-    </div>
-
-    {/* Lista filtrada */}
-    {filteredProducts.length === 0 ? (
-      <div style={{ background: 'var(--black-card)', border: '1px solid var(--border)', padding: '48px', textAlign: 'center' }}>
-        <p style={{ color: 'var(--white-muted)' }}>No se encontraron productos</p>
-      </div>
-    ) : (
-      Object.entries(
-        filteredProducts.reduce((acc, p) => {
-          if (!acc[p.category]) acc[p.category] = []
-          acc[p.category].push(p)
-          return acc
-        }, {})
-      ).map(([cat, prods]) => (
-        <div key={cat} style={{ marginBottom: '32px' }}>
-          {/* Header categoría */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-            <span style={{ fontSize: '1rem' }}>
-              {cat === 'accesorios' ? '⌚' : cat === 'ropa' ? '👕' : '✂'}
-            </span>
-            <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1rem', color: 'var(--gold)', margin: 0 }}>
-              {CATEGORY_LABEL[cat]} <span style={{ fontSize: '0.72rem', color: 'var(--white-muted)', fontFamily: 'DM Sans, sans-serif' }}>({prods.length})</span>
-            </h3>
-            <div style={{ flex: 1, height: '1px', background: 'var(--border)' }}/>
+      {/* Banner sin stock */}
+      {outOfStock.length > 0 && (
+        <div style={{
+          background: 'rgba(245,158,11,0.08)',
+          border: '1px solid rgba(245,158,11,0.3)',
+          padding: '14px 20px',
+          marginBottom: '24px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '6px',
+        }}>
+          <div style={{ fontSize: '0.75rem', color: '#F59E0B', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '4px' }}>
+            ⚠ Productos sin stock
           </div>
+          {outOfStock.map(p => (
+            <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.85rem', color: 'var(--white)' }}>
+                {p.name}
+              </span>
+              <button
+                className="btn-gold"
+                onClick={() => { openEdit(p); setTab('products') }}
+                style={{ padding: '4px 12px', fontSize: '0.65rem' }}
+              >
+                Actualizar stock
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-            {prods.map(p => (
-              <div key={p.id} style={{
-                background: 'var(--black-card)', border: '1px solid var(--border)',
-                padding: '16px 20px', display: 'flex', justifyContent: 'space-between',
-                alignItems: 'center', flexWrap: 'wrap', gap: '12px',
-                transition: 'border-color 0.3s',
+      {tab === 'products' && (
+        <div>
+          {/* Búsqueda y filtros */}
+          <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <input
+              placeholder="🔍 Buscar producto..."
+              value={search} onChange={e => setSearch(e.target.value)}
+              style={{
+                flex: 1, minWidth: '200px', padding: '10px 16px',
+                background: 'var(--black)', border: '1px solid var(--border)',
+                color: 'var(--white)', fontSize: '0.85rem', outline: 'none',
+                fontFamily: 'DM Sans, sans-serif',
               }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)'}
-              onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                  <div style={{
-                    width: '48px', height: '48px', background: 'var(--black-soft)',
-                    border: '1px solid var(--border)', overflow: 'hidden', flexShrink: 0,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem',
-                  }}>
-                    {p.image_url
-                      ? <img src={p.image_url} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
-                      : (cat === 'accesorios' ? '' : cat === 'ropa' ? '' : '')
-                    }
-                  </div>
-                  <div>
-                    <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '0.95rem', color: 'var(--white)', marginBottom: '3px' }}>{p.name}</div>
-                    {p.description && (
-                      <div style={{ fontSize: '0.72rem', color: 'var(--white-muted)', marginBottom: '3px', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {p.description}
-                      </div>
-                    )}
-                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.68rem', color: p.stock < 5 ? '#F59E0B' : 'var(--white-muted)' }}>
-                        {p.stock === 0 ? '✕ Sin stock' : `Stock: ${p.stock}`}
-                      </span>
-                      
-                    </div>
-                  </div>
-                </div>
-                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                  <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.2rem', color: 'var(--gold)' }}>
-                    ${Number(p.price).toLocaleString('es-CO')}
-                  </div>
-                  <button onClick={() => openEdit(p)} className="btn-gold"
-  style={{ padding: '6px 14px', fontSize: '0.68rem' }}>
-  Editar
-</button>
-<button onClick={() => {
-  if (confirm('¿Eliminar este producto permanentemente?')) {
-    api.put(`/shop/products/${p.id}`, { is_active: 0 }).then(() =>
-      api.get('/shop/products').then(r => setProducts(r.data.data.products))
-    )
-  }
-}} style={{
-  background: 'none',
-  border: '1px solid rgba(239,68,68,0.3)',
-  color: '#fc8181',
-  padding: '6px 12px', fontSize: '0.68rem', cursor: 'pointer',
-  letterSpacing: '0.1em', textTransform: 'uppercase', transition: 'all 0.3s',
-}}>
-  Eliminar
-</button>
-                </div>
-              </div>
+              onFocus={e => e.target.style.borderColor = 'var(--gold)'}
+              onBlur={e  => e.target.style.borderColor = 'var(--border)'}
+            />
+            {['', 'accesorios', 'ropa', 'barberia'].map(cat => (
+              <button key={cat} onClick={() => setCatFilter(cat)}
+                className={catFilter === cat ? 'btn-gold' : 'btn-outline'}
+                style={{ padding: '8px 16px', fontSize: '0.72rem' }}>
+                {cat === '' ? 'Todos' : cat === 'accesorios' ? '⌚ Accesorios' : cat === 'ropa' ? '👕 Ropa' : '✂ Barbería'}
+              </button>
             ))}
           </div>
+
+          {/* Lista filtrada */}
+          {filteredProducts.length === 0 ? (
+            <div style={{ background: 'var(--black-card)', border: '1px solid var(--border)', padding: '48px', textAlign: 'center' }}>
+              <p style={{ color: 'var(--white-muted)' }}>No se encontraron productos</p>
+            </div>
+          ) : (
+            Object.entries(
+              filteredProducts.reduce((acc, p) => {
+                if (!acc[p.category]) acc[p.category] = []
+                acc[p.category].push(p)
+                return acc
+              }, {})
+            ).map(([cat, prods]) => (
+              <div key={cat} style={{ marginBottom: '32px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                  <span style={{ fontSize: '1rem' }}>
+                    {cat === 'accesorios' ? '⌚' : cat === 'ropa' ? '👕' : '✂'}
+                  </span>
+                  <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1rem', color: 'var(--gold)', margin: 0 }}>
+                    {CATEGORY_LABEL[cat]} <span style={{ fontSize: '0.72rem', color: 'var(--white-muted)', fontFamily: 'DM Sans, sans-serif' }}>({prods.length})</span>
+                  </h3>
+                  <div style={{ flex: 1, height: '1px', background: 'var(--border)' }}/>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  {prods.map(p => (
+                    <div key={p.id} style={{
+                      background: 'var(--black-card)', border: '1px solid var(--border)',
+                      padding: '16px 20px', display: 'flex', justifyContent: 'space-between',
+                      alignItems: 'center', flexWrap: 'wrap', gap: '12px',
+                      transition: 'border-color 0.3s',
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)'}
+                    onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}>
+                      <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                        <div style={{
+                          width: '48px', height: '48px', background: 'var(--black-soft)',
+                          border: '1px solid var(--border)', overflow: 'hidden', flexShrink: 0,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem',
+                        }}>
+                          {p.image_url
+                            ? <img src={p.image_url} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+                            : (cat === 'accesorios' ? '' : cat === 'ropa' ? '' : '')
+                          }
+                        </div>
+                        <div>
+                          <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '0.95rem', color: 'var(--white)', marginBottom: '3px' }}>{p.name}</div>
+                          {p.description && (
+                            <div style={{ fontSize: '0.72rem', color: 'var(--white-muted)', marginBottom: '3px', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {p.description}
+                            </div>
+                          )}
+                          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                            <span style={{ fontSize: '0.68rem', color: p.stock < 5 ? '#F59E0B' : 'var(--white-muted)' }}>
+                              {p.stock === 0 ? '✕ Sin stock' : `Stock: ${p.stock}`}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                        <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.2rem', color: 'var(--gold)' }}>
+                          ${Number(p.price).toLocaleString('es-CO')}
+                        </div>
+                        <button onClick={() => openEdit(p)} className="btn-gold"
+                          style={{ padding: '6px 14px', fontSize: '0.68rem' }}>
+                          Editar
+                        </button>
+                        <button onClick={() => {
+                          if (confirm('¿Eliminar este producto permanentemente?')) {
+                            api.put(`/shop/products/${p.id}`, { is_active: 0 }).then(() =>
+                              api.get('/shop/products').then(r => setProducts(r.data.data.products))
+                            )
+                          }
+                        }} style={{
+                          background: 'none',
+                          border: '1px solid rgba(239,68,68,0.3)',
+                          color: '#fc8181',
+                          padding: '6px 12px', fontSize: '0.68rem', cursor: 'pointer',
+                          letterSpacing: '0.1em', textTransform: 'uppercase', transition: 'all 0.3s',
+                        }}>
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))
+          )}
         </div>
-      ))
-    )}
-  </div>
-)}
+      )}
 
       {/* Agregar producto */}
       {tab === 'add' && (
