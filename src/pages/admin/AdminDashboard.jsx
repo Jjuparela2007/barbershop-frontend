@@ -31,13 +31,13 @@ export default function AdminDashboard() {
   const handleLogout = () => { logout(); navigate('/') }
 
   const menuItems = [
-    { key: 'dashboard',    label: 'Dashboard',     icon: '◈' },
-    { key: 'appointments', label: 'Citas',          icon: '📋' },
-    { key: 'users',        label: 'Usuarios',       icon: '👥' },
-    { key: 'barbers',      label: 'Barberos',       icon: '✂' },
-    { key: 'horarios',     label: 'Horarios',       icon: '🗓' },
-    { key: 'ratings',      label: 'Calificaciones', icon: '★' },
-    { key: 'shop', label: 'Tienda', icon: '🛍' }
+    { key: 'dashboard',    label: 'Dashboard',     icon:  '' },
+    { key: 'appointments', label: 'Citas',          icon: '' },
+    { key: 'users',        label: 'Usuarios',       icon: '' },
+    { key: 'barbers',      label: 'Barberos',       icon: '' },
+    { key: 'horarios',     label: 'Horarios',       icon: '' },
+    { key: 'ratings',      label: 'Calificaciones', icon: '' },
+    { key: 'shop',         label: 'Tienda',         icon: '' }
   ]
 
   return (
@@ -146,7 +146,7 @@ function SectionDashboard({ stats }) {
           display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px',
         }}>
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-            <span style={{ fontSize: '1.3rem' }}>⏳</span>
+            <span style={{ fontSize: '1.3rem' }}></span>
             <div>
               <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.1rem', color: '#F59E0B' }}>
                 {stats.pending_appointments} cita{stats.pending_appointments > 1 ? 's' : ''} pendiente{stats.pending_appointments > 1 ? 's' : ''} de confirmar
@@ -226,8 +226,8 @@ function SectionDashboard({ stats }) {
             </div>
             <div style={{ display: 'flex', gap: '32px', flexWrap: 'wrap' }}>
               {[
-                { label: '✂ Servicios', val: current.data?.services },
-                { label: '🛍 Tienda',   val: current.data?.shop     },
+                { label: 'Servicios', val: current.data?.services },
+                { label: ' Tienda',   val: current.data?.shop     },
                 { label: 'Citas',       val: current.data?.count    },
               ].map((item, i) => (
                 <div key={item.label}>
