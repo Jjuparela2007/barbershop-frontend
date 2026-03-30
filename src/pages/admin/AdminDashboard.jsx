@@ -1345,8 +1345,11 @@ function SectionShop() {
   const [editForm,    setEditForm]    = useState({})
   const [editSaving,  setEditSaving]  = useState(false)
   const [editMsg,     setEditMsg]     = useState('')
-  const [search,    setSearch]    = useState('')
-  const [catFilter, setCatFilter] = useState('')
+  const [search,      setSearch]      = useState('')
+  const [catFilter,   setCatFilter]   = useState('')
+
+  const [orderDetail,        setOrderDetail]        = useState(null)
+  const [orderDetailLoading, setOrderDetailLoading] = useState(false)
 
   useEffect(() => {
     api.get('/shop/products').then(r => setProducts(r.data.data.products))
@@ -1405,6 +1408,18 @@ function SectionShop() {
     api.get('/shop/orders').then(r => setOrders(r.data.data.orders))
   }
 
+  const openOrderDetail = async (id) => {
+    setOrderDetailLoading(true)
+    try {
+      const { data } = await api.get(`/shop/orders/${id}`)
+      setOrderDetail(data.data.order)
+    } catch (err) {
+      alert('Error al cargar la orden')
+    } finally {
+      setOrderDetailLoading(false)
+    }
+  }
+
   const CATEGORY_LABEL = { accesorios: 'Accesorios', ropa: 'Ropa', barberia: 'Barbería' }
   const STATUS_COLOR   = { pending: '#F59E0B', completed: '#10B981', cancelled: '#EF4444' }
   const STATUS_LABEL   = { pending: 'Pendiente', completed: 'Completada', cancelled: 'Cancelada' }
@@ -1453,25 +1468,17 @@ function SectionShop() {
         <div style={{
           background: 'rgba(245,158,11,0.08)',
           border: '1px solid rgba(245,158,11,0.3)',
-          padding: '14px 20px',
-          marginBottom: '24px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '6px',
+          padding: '14px 20px', marginBottom: '24px',
+          display: 'flex', flexDirection: 'column', gap: '6px',
         }}>
           <div style={{ fontSize: '0.75rem', color: '#F59E0B', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '4px' }}>
             ⚠ Productos sin stock
           </div>
           {outOfStock.map(p => (
             <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.85rem', color: 'var(--white)' }}>
-                {p.name}
-              </span>
-              <button
-                className="btn-gold"
-                onClick={() => { openEdit(p); setTab('products') }}
-                style={{ padding: '4px 12px', fontSize: '0.65rem' }}
-              >
+              <span style={{ fontSize: '0.85rem', color: 'var(--white)' }}>{p.name}</span>
+              <button className="btn-gold" onClick={() => { openEdit(p); setTab('products') }}
+                style={{ padding: '4px 12px', fontSize: '0.65rem' }}>
                 Actualizar stock
               </button>
             </div>
@@ -1479,9 +1486,9 @@ function SectionShop() {
         </div>
       )}
 
+      {/* Tab productos */}
       {tab === 'products' && (
         <div>
-          {/* Búsqueda y filtros */}
           <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
             <input
               placeholder="🔍 Buscar producto..."
@@ -1504,7 +1511,6 @@ function SectionShop() {
             ))}
           </div>
 
-          {/* Lista filtrada */}
           {filteredProducts.length === 0 ? (
             <div style={{ background: 'var(--black-card)', border: '1px solid var(--border)', padding: '48px', textAlign: 'center' }}>
               <p style={{ color: 'var(--white-muted)' }}>No se encontraron productos</p>
@@ -1527,14 +1533,12 @@ function SectionShop() {
                   </h3>
                   <div style={{ flex: 1, height: '1px', background: 'var(--border)' }}/>
                 </div>
-
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                   {prods.map(p => (
                     <div key={p.id} style={{
                       background: 'var(--black-card)', border: '1px solid var(--border)',
                       padding: '16px 20px', display: 'flex', justifyContent: 'space-between',
-                      alignItems: 'center', flexWrap: 'wrap', gap: '12px',
-                      transition: 'border-color 0.3s',
+                      alignItems: 'center', flexWrap: 'wrap', gap: '12px', transition: 'border-color 0.3s',
                     }}
                     onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)'}
                     onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}>
@@ -1556,19 +1560,16 @@ function SectionShop() {
                               {p.description}
                             </div>
                           )}
-                          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                            <span style={{ fontSize: '0.68rem', color: p.stock < 5 ? '#F59E0B' : 'var(--white-muted)' }}>
-                              {p.stock === 0 ? '✕ Sin stock' : `Stock: ${p.stock}`}
-                            </span>
-                          </div>
+                          <span style={{ fontSize: '0.68rem', color: p.stock < 5 ? '#F59E0B' : 'var(--white-muted)' }}>
+                            {p.stock === 0 ? '✕ Sin stock' : `Stock: ${p.stock}`}
+                          </span>
                         </div>
                       </div>
                       <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                         <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.2rem', color: 'var(--gold)' }}>
                           ${Number(p.price).toLocaleString('es-CO')}
                         </div>
-                        <button onClick={() => openEdit(p)} className="btn-gold"
-                          style={{ padding: '6px 14px', fontSize: '0.68rem' }}>
+                        <button onClick={() => openEdit(p)} className="btn-gold" style={{ padding: '6px 14px', fontSize: '0.68rem' }}>
                           Editar
                         </button>
                         <button onClick={() => {
@@ -1578,9 +1579,7 @@ function SectionShop() {
                             )
                           }
                         }} style={{
-                          background: 'none',
-                          border: '1px solid rgba(239,68,68,0.3)',
-                          color: '#fc8181',
+                          background: 'none', border: '1px solid rgba(239,68,68,0.3)', color: '#fc8181',
                           padding: '6px 12px', fontSize: '0.68rem', cursor: 'pointer',
                           letterSpacing: '0.1em', textTransform: 'uppercase', transition: 'all 0.3s',
                         }}>
@@ -1596,7 +1595,7 @@ function SectionShop() {
         </div>
       )}
 
-      {/* Agregar producto */}
+      {/* Tab agregar producto */}
       {tab === 'add' && (
         <div style={{ maxWidth: '520px' }}>
           {msg && (
@@ -1641,7 +1640,7 @@ function SectionShop() {
         </div>
       )}
 
-      {/* Pedidos */}
+      {/* Tab pedidos */}
       {tab === 'orders' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
           {orders.length === 0 ? (
@@ -1651,11 +1650,16 @@ function SectionShop() {
           ) : orders.map(o => {
             const sc = STATUS_COLOR[o.status] || '#6B7280'
             return (
-              <div key={o.id} style={{
-                background: 'var(--black-card)', border: '1px solid var(--border)',
-                padding: '16px 20px', display: 'flex', justifyContent: 'space-between',
-                alignItems: 'center', flexWrap: 'wrap', gap: '12px',
-              }}>
+              <div key={o.id}
+                onClick={() => openOrderDetail(o.id)}
+                style={{
+                  background: 'var(--black-card)', border: '1px solid var(--border)',
+                  padding: '16px 20px', display: 'flex', justifyContent: 'space-between',
+                  alignItems: 'center', flexWrap: 'wrap', gap: '12px',
+                  cursor: 'pointer', transition: 'border-color 0.3s',
+                }}
+                onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)'}
+                onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}>
                 <div>
                   <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '0.95rem', color: 'var(--white)', marginBottom: '2px' }}>
                     Orden #{o.id} — {o.client_name}
@@ -1673,13 +1677,17 @@ function SectionShop() {
                   </div>
                   {o.status === 'pending' && (
                     <>
-                      <button className="btn-gold" onClick={() => updateStatus(o.id, 'completed')} style={{ padding: '6px 12px', fontSize: '0.68rem' }}>
+                      <button className="btn-gold"
+                        onClick={e => { e.stopPropagation(); updateStatus(o.id, 'completed') }}
+                        style={{ padding: '6px 12px', fontSize: '0.68rem' }}>
                         Completar
                       </button>
-                      <button onClick={() => updateStatus(o.id, 'cancelled')} style={{
-                        background: 'none', border: '1px solid rgba(239,68,68,0.3)', color: '#fc8181',
-                        padding: '6px 12px', fontSize: '0.68rem', cursor: 'pointer', transition: 'all 0.3s',
-                      }}>
+                      <button
+                        onClick={e => { e.stopPropagation(); updateStatus(o.id, 'cancelled') }}
+                        style={{
+                          background: 'none', border: '1px solid rgba(239,68,68,0.3)', color: '#fc8181',
+                          padding: '6px 12px', fontSize: '0.68rem', cursor: 'pointer', transition: 'all 0.3s',
+                        }}>
                         Cancelar
                       </button>
                     </>
@@ -1712,7 +1720,6 @@ function SectionShop() {
               <button onClick={() => setEditing(null)}
                 style={{ background: 'none', border: 'none', color: 'var(--white-muted)', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
             </div>
-
             <form onSubmit={handleUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {[
                 { key: 'name',        label: 'Nombre',      type: 'text',   required: true  },
@@ -1731,7 +1738,6 @@ function SectionShop() {
                   />
                 </div>
               ))}
-
               <div>
                 <label style={{ display: 'block', fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--white-muted)', marginBottom: '6px' }}>Categoría</label>
                 <select value={editForm.category} onChange={e => setEditForm({ ...editForm, category: e.target.value })}
@@ -1741,7 +1747,6 @@ function SectionShop() {
                   <option value="barberia">Cuidado Personal</option>
                 </select>
               </div>
-
               {editMsg && (
                 <div style={{
                   padding: '10px 14px', fontSize: '0.82rem',
@@ -1750,7 +1755,6 @@ function SectionShop() {
                   color: editMsg.startsWith('✓') ? '#6ee7b7' : '#fc8181',
                 }}>{editMsg}</div>
               )}
-
               <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
                 <button type="button" className="btn-outline" onClick={() => setEditing(null)} style={{ flex: 1 }}>Cancelar</button>
                 <button type="submit" className="btn-gold" disabled={editSaving} style={{ flex: 1, opacity: editSaving ? 0.7 : 1 }}>
@@ -1758,6 +1762,91 @@ function SectionShop() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal detalle de orden */}
+      {orderDetail && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 2000,
+          background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
+        }} onClick={e => { if (e.target === e.currentTarget) setOrderDetail(null) }}>
+          <div style={{
+            background: 'var(--black-soft)', border: '1px solid var(--border)',
+            width: '100%', maxWidth: '520px', maxHeight: '90vh', overflowY: 'auto', padding: '40px',
+          }}>
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
+              <div>
+                <span className="section-label">✦ Detalle</span>
+                <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.2rem', color: 'var(--white)', marginTop: '4px' }}>
+                  Orden #{orderDetail.id} — {orderDetail.client_name}
+                </h3>
+                <div style={{ fontSize: '0.72rem', color: 'var(--white-muted)', marginTop: '4px' }}>
+                  {new Date(orderDetail.created_at).toLocaleDateString('es-CO', { dateStyle: 'long' })}
+                </div>
+              </div>
+              <button onClick={() => setOrderDetail(null)}
+                style={{ background: 'none', border: 'none', color: 'var(--white-muted)', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
+            </div>
+
+            {/* Items */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginBottom: '24px' }}>
+              {orderDetail.items.map((item, i) => (
+                <div key={i} style={{
+                  background: 'var(--black-card)', border: '1px solid var(--border)',
+                  padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px',
+                }}>
+                  <div>
+                    <div style={{ fontSize: '0.88rem', color: 'var(--white)', marginBottom: '3px' }}>{item.product_name}</div>
+                    <div style={{ fontSize: '0.68rem', color: 'var(--white-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                      {CATEGORY_LABEL[item.category] || item.category}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--white-muted)', marginBottom: '2px' }}>
+                      {item.quantity} × ${Number(item.unit_price).toLocaleString('es-CO')}
+                    </div>
+                    <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1rem', color: 'var(--gold)' }}>
+                      ${Number(item.unit_price * item.quantity).toLocaleString('es-CO')}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Notas */}
+            {orderDetail.notes && (
+              <div style={{
+                background: 'var(--black-card)', border: '1px solid var(--border)',
+                padding: '12px 16px', marginBottom: '20px', fontSize: '0.82rem', color: 'var(--white-muted)',
+              }}>
+                📝 {orderDetail.notes}
+              </div>
+            )}
+
+            {/* Total */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: '20px' }}>
+              <span style={{ fontSize: '0.82rem', color: 'var(--white-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Total</span>
+              <span style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.5rem', color: 'var(--gold)' }}>
+                ${Number(orderDetail.total).toLocaleString('es-CO')}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Loader detalle orden */}
+      {orderDetailLoading && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 2000,
+          background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <div style={{ color: 'var(--gold)', fontFamily: 'Playfair Display, serif', fontSize: '1rem' }}>
+            Cargando orden...
           </div>
         </div>
       )}
