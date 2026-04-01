@@ -321,7 +321,10 @@ function WalkInSale({ barberId }) {
   }
 
   const selectedService = services.find(s => s.id == form.service_id)
-  const totalHoy = history.reduce((sum, a) => sum + Number(a.price || 0), 0)
+  const totalHoy = history.reduce((sum, a) => {
+  const price = a.price || a.service_price || a.total || 0
+  return sum + Number(price)
+}, 0)
 
   const inputStyle = {
     width: '100%', padding: '12px 14px',
@@ -483,7 +486,7 @@ function WalkInSale({ barberId }) {
                     </div>
                   </div>
                   <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '0.95rem', color: 'var(--gold)' }}>
-                    ${Number(a.price).toLocaleString('es-CO')}
+                    ${Number(a.price || a.service_price || 0).toLocaleString('es-CO')}
                   </div>
                 </div>
               ))}
