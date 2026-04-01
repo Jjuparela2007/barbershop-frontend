@@ -297,7 +297,8 @@ function WalkInSale({ barberId }) {
     const { data } = await api.get(`/appointments/walk-in/${barberId}`, { 
       params: { date: today } 
     })
-    setHistory(data.data.appointments) // Ya no necesitas filtrar porque el backend solo devuelve walk-in
+    setHistory(data.data.appointments)
+    console.log('Historia:', data.data.appointments) // Ya no necesitas filtrar porque el backend solo devuelve walk-in
   } catch (err) { 
     console.error(err) 
   }
