@@ -45,7 +45,7 @@ function Hero() {
       <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%', paddingTop: '80px', position: 'relative', zIndex: 2 }}>
         <div style={{ maxWidth: '680px' }}>
           <div className="animate-fade-up delay-100">
-            <span className="section-label">✦ Bienvenido a la excelencia</span>
+            
           </div>
 
           <h1 className="animate-fade-up delay-200" style={{
