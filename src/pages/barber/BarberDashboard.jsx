@@ -292,17 +292,22 @@ function WalkInSale({ barberId }) {
   }, [])
 
   const fetchHistory = async () => {
-  try {
-    const today = new Date().toISOString().split('T')[0]
-    const { data } = await api.get(`/appointments/walk-in/${barberId}`, { 
-      params: { date: today } 
-    })
-    setHistory(data.data.appointments)
-    console.log('Historia:', data.data.appointments) // Ya no necesitas filtrar porque el backend solo devuelve walk-in
-  } catch (err) { 
-    console.error(err) 
+    try {
+      // Fecha en hora Colombia
+      const now   = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Bogota' }))
+      const year  = now.getFullYear()
+      const month = (now.getMonth() + 1).toString().padStart(2, '0')
+      const day   = now.getDate().toString().padStart(2, '0')
+      const today = `${year}-${month}-${day}`
+
+      const { data } = await api.get(`/appointments/walk-in/${barberId}`, {
+        params: { date: today }
+      })
+      setHistory(data.data.appointments)
+    } catch (err) {
+      console.error(err)
+    }
   }
-}
 
   const handleSubmit = async () => {
     if (!form.service_id)  { setError('Selecciona un servicio'); return }
@@ -314,17 +319,14 @@ function WalkInSale({ barberId }) {
       const { data } = await api.post('/appointments/walk-in', form)
       setSuccess(data.data.appointment)
       setForm({ service_id: '', client_name: '', notes: '' })
-      fetchHistory() // Recargar historial después de crear
+      fetchHistory()
     } catch (err) {
       setError(err.response?.data?.error || 'Error al registrar la venta')
     } finally { setLoading(false) }
   }
 
   const selectedService = services.find(s => s.id == form.service_id)
-  const totalHoy = history.reduce((sum, a) => {
-  const price = a.price || a.service_price || a.total || 0
-  return sum + Number(price)
-}, 0)
+  const totalHoy = history.reduce((sum, a) => sum + parseFloat(a.price || 0), 0)
 
   const inputStyle = {
     width: '100%', padding: '12px 14px',
@@ -478,7 +480,7 @@ function WalkInSale({ barberId }) {
                     }}>{i + 1}</div>
                     <div>
                       <div style={{ fontSize: '0.85rem', color: 'var(--white)', marginBottom: '2px' }}>
-                        {a.client_name || a.notes?.replace('Walk-in: ', '').split(' - ')[0] || 'Cliente'}
+                        {a.notes?.replace('Walk-in: ', '').split(' - ')[0] || 'Cliente'}
                       </div>
                       <div style={{ fontSize: '0.7rem', color: 'var(--white-muted)' }}>
                         {a.service_name} · {a.start_time?.slice(0,5)}
@@ -486,7 +488,7 @@ function WalkInSale({ barberId }) {
                     </div>
                   </div>
                   <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '0.95rem', color: 'var(--gold)' }}>
-                    ${Number(a.price || a.service_price || 0).toLocaleString('es-CO')}
+                    ${parseFloat(a.price || 0).toLocaleString('es-CO')}
                   </div>
                 </div>
               ))}
