@@ -45,7 +45,7 @@ export default function Navbar() {
       <div style={{
         maxWidth: '1200px', margin: '0 auto',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        height: '150px',
+        height: '120px',
       }}>
         {/* Logo */}
         <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -83,20 +83,19 @@ export default function Navbar() {
         </Link>
 
         {/* Links desktop */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}
-             className="hidden md:flex">
-          {navLinks.map(link => (
-            <a key={link.label} href={link.href} style={{
-              color: 'var(--white-muted)', textDecoration: 'none',
-              fontSize: '0.78rem', letterSpacing: '0.15em',
-              textTransform: 'uppercase', transition: 'color 0.3s ease',
-            }}
-            onMouseEnter={e => e.target.style.color = 'var(--gold)'}
-            onMouseLeave={e => e.target.style.color = 'var(--white-muted)'}>
-              {link.label}
-            </a>
-          ))}
-        </div>
+        {/* Links desktop */}
+<div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}
+     className="hidden md:flex">
+  {navLinks.map(link => (
+    <a 
+      key={link.label} 
+      href={link.href} 
+      className="nav-link"
+    >
+      {link.label}
+    </a>
+  ))}
+</div>
 
         {/* Botones según estado de sesión — desktop */}
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}
