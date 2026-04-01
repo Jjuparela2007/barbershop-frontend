@@ -1491,7 +1491,7 @@ function SectionShop() {
         <div>
           <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
             <input
-              placeholder="🔍 Buscar producto..."
+              placeholder=" Buscar producto..."
               value={search} onChange={e => setSearch(e.target.value)}
               style={{
                 flex: 1, minWidth: '200px', padding: '10px 16px',
@@ -1506,7 +1506,7 @@ function SectionShop() {
               <button key={cat} onClick={() => setCatFilter(cat)}
                 className={catFilter === cat ? 'btn-gold' : 'btn-outline'}
                 style={{ padding: '8px 16px', fontSize: '0.72rem' }}>
-                {cat === '' ? 'Todos' : cat === 'accesorios' ? '⌚ Accesorios' : cat === 'ropa' ? '👕 Ropa' : '✂ Barbería'}
+                {cat === '' ? 'Todos' : cat === 'accesorios' ? ' Accesorios' : cat === 'ropa' ? ' Ropa' : 'Cuidado Personal'}
               </button>
             ))}
           </div>
@@ -1526,7 +1526,7 @@ function SectionShop() {
               <div key={cat} style={{ marginBottom: '32px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
                   <span style={{ fontSize: '1rem' }}>
-                    {cat === 'accesorios' ? '⌚' : cat === 'ropa' ? '👕' : '✂'}
+                    {cat === 'accesorios' ? '' : cat === 'ropa' ? '' : ''}
                   </span>
                   <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1rem', color: 'var(--gold)', margin: 0 }}>
                     {CATEGORY_LABEL[cat]} <span style={{ fontSize: '0.72rem', color: 'var(--white-muted)', fontFamily: 'DM Sans, sans-serif' }}>({prods.length})</span>
