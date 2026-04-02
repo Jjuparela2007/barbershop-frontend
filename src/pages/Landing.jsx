@@ -500,7 +500,7 @@ function Contact() {
                 fontSize: '18px', color: 'var(--gold)',
               }}>✂</div>
               <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.2rem', color: 'var(--white)' }}>
-                BARBERSHOP
+                JJ Barber Studio
               </div>
             </div>
             <p style={{ color: 'var(--white-muted)', lineHeight: '1.8', fontSize: '0.9rem', marginBottom: '32px' }}>
@@ -551,7 +551,7 @@ function Contact() {
           {[
             { title: 'Ubicación', items: ['Calle 123 #45-67', 'Bogotá, Colombia'] },
             { title: 'Horario', items: ['Lun–Vie: 9am – 6pm', 'Sábado: 9am – 2pm', 'Domingo: Cerrado'] },
-            { title: 'Contacto', items: ['+57 300 123 4567', 'info@barbershop.com'] },
+            { title: 'Contacto', items: ['+57 300 123 4567', 'info@jjbarberstudio.com'] },
           ].map(col => (
             <div key={col.title}>
               <h4 style={{
@@ -582,7 +582,7 @@ function Contact() {
   backgroundColor: 'var(--dark-bg)' // opcional, si quieres fondo
 }}>
   <span style={{ fontSize: '0.75rem', color: 'var(--white-muted)' }}>
-    © 2026 Barbershop. Todos los derechos reservados.
+    © 2026 JJ Barber Studio. Todos los derechos reservados.
   </span>
 </div>
           

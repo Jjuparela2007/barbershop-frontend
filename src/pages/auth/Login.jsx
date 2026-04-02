@@ -88,15 +88,7 @@ export default function Login() {
         {/* Logo */}
         <div className="animate-fade-up delay-100" style={{ textAlign: 'center', marginBottom: '48px' }}>
           <Link to="/" style={{ textDecoration: 'none', display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-            <div style={{
-              width: '48px', height: '48px',
-              border: '1px solid var(--gold)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '22px', color: 'var(--gold)',
-            }}>✂</div>
-            <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.1rem', color: '#1a1a1a', letterSpacing: '0.1em' }}>
-              BARBERSHOP
-            </div>
+           
           </Link>
         </div>
 

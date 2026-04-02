@@ -73,7 +73,7 @@ export default function Navbar() {
               fontFamily: 'Playfair Display, serif',
               fontSize: '1.2rem', fontWeight: '700',
               color: 'var(--white)', letterSpacing: '0.05em',
-            }}>BARBERSHOP</div>
+            }}>JJ Barber Studio</div>
             <div style={{
               fontSize: '0.55rem', letterSpacing: '0.3em',
               color: 'var(--gold)', textTransform: 'uppercase',
