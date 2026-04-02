@@ -55,11 +55,11 @@ function Hero() {
             color: 'var(--white)',
             margin: '24px 0 8px',
           }}>
-            El Arte del
+            Lujo, 
             <br/>
-            <span className="gold-shimmer">Caballero</span>
+            <span className="gold-shimmer">precisión</span>
             <br/>
-            Moderno
+             y estilo
           </h1>
 
           <div className="animate-fade-up delay-300" style={{
@@ -71,8 +71,8 @@ function Hero() {
             color: 'var(--white-muted)', fontSize: '1.05rem',
             lineHeight: '1.8', maxWidth: '480px', marginBottom: '48px',
           }}>
-            Más que un corte de cabello — una experiencia de transformación.
-            Maestros del estilo que elevan tu imagen al siguiente nivel.
+            Barbería en Usaquén, Bogotá — cortes modernos y estilo masculino premium.
+Transforma tu imagen con barberos expertos en tendencia, precisión y detalle.
           </p>
 
           <div className="animate-fade-up delay-500" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>

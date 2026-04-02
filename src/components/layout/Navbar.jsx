@@ -50,9 +50,8 @@ export default function Navbar() {
         {/* Logo */}
         <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{
-          width: '36px',
-          height: '36px',
-          border: '1px solid var(--gold)',
+          width: '66px',
+          height: '66px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
