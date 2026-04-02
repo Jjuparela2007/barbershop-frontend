@@ -93,7 +93,7 @@ export default function Register() {
               fontSize: '22px', color: 'var(--gold)',
             }}>✂</div>
             <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.1rem', color: '#1a1a1a', letterSpacing: '0.1em' }}>
-              JJ Barber Studio
+              Golden House Barber
             </div>
           </Link>
         </div>
