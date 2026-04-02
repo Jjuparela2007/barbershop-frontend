@@ -37,7 +37,8 @@ export default function AdminDashboard() {
     { key: 'barbers',      label: 'Barberos',       icon: '' },
     { key: 'horarios',     label: 'Horarios',       icon: '' },
     { key: 'ratings',      label: 'Calificaciones', icon: '' },
-    { key: 'shop',         label: 'Tienda',         icon: '' }
+    { key: 'shop',         label: 'Tienda',         icon: '' },
+    { key: 'services',     label: 'Servicios',      icon: '✂' },
   ]
 
   return (
@@ -84,7 +85,8 @@ export default function AdminDashboard() {
         {section === 'barbers'      && <SectionBarbers />}
         {section === 'horarios'     && <SectionHorarios />}
         {section === 'ratings'      && <SectionRatings />}
-        {section === 'shop' && <SectionShop />}
+        {section === 'shop'         && <SectionShop />}
+        {section === 'services'     && <SectionServices />}
       </div>
     </div>
   )
@@ -130,13 +132,11 @@ function SectionDashboard({ stats }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
 
-      {/* Encabezado */}
       <div>
         <span className="section-label">✦ Resumen general</span>
         <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.8rem', color: 'var(--white)', margin: '8px 0 0' }}>Dashboard</h2>
       </div>
 
-      {/* ══ NIVEL 1 — Citas pendientes (urgente) ══════════════════ */}
       {hasPending && (
         <div style={{
           background: 'rgba(245,158,11,0.08)',
@@ -162,12 +162,9 @@ function SectionDashboard({ stats }) {
         </div>
       )}
 
-      {/* ══ NIVEL 2 — KPIs del día ════════════════════════════════ */}
       <div>
         <p style={{ fontSize: '0.65rem', color: 'var(--white-muted)', letterSpacing: '0.25em', textTransform: 'uppercase', margin: '0 0 14px' }}>Hoy</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '2px' }}>
-
-          {/* Ingresos hoy — destacado con fondo dorado */}
           <div style={{
             background: 'linear-gradient(135deg, rgba(201,168,76,0.12), rgba(201,168,76,0.04))',
             border: '1px solid rgba(201,168,76,0.3)', padding: '28px 24px',
@@ -180,7 +177,6 @@ function SectionDashboard({ stats }) {
               {revenue?.daily?.count || 0} citas completadas
             </div>
           </div>
-
           {[
             { label: 'Clientes activos', value: stats.total_clients,      sub: 'registrados'  },
             { label: 'Barberos',         value: stats.total_barbers,      sub: 'en el equipo' },
@@ -195,7 +191,6 @@ function SectionDashboard({ stats }) {
         </div>
       </div>
 
-      {/* ══ NIVEL 3 — Ingresos del período ═══════════════════════ */}
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
           <p style={{ fontSize: '0.65rem', color: 'var(--white-muted)', letterSpacing: '0.25em', textTransform: 'uppercase', margin: 0 }}>Ingresos</p>
@@ -215,8 +210,6 @@ function SectionDashboard({ stats }) {
         </div>
 
         <div style={{ background: 'var(--black-card)', border: '1px solid var(--border)' }}>
-
-          {/* Total grande */}
           <div style={{ padding: '36px 32px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '24px' }}>
             <div>
               <div style={{ fontSize: '0.7rem', color: 'var(--white-muted)', marginBottom: '10px' }}>{current.label} · total combinado</div>
@@ -228,10 +221,9 @@ function SectionDashboard({ stats }) {
               {[
                 { label: 'Servicios', val: current.data?.services },
                 { label: ' Tienda',   val: current.data?.shop     },
-                { label: 'Citas',       val: current.data?.count    },
+                { label: 'Citas',     val: current.data?.count    },
               ].map((item, i) => (
                 <div key={item.label}>
-                  {i > 0 && <div style={{ display: 'none' }}/>}
                   <div style={{ fontSize: '0.63rem', color: 'var(--white-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>{item.label}</div>
                   <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', color: 'var(--white)' }}>
                     {i < 2 ? `$${Number(item.val || 0).toLocaleString('es-CO')}` : (item.val || 0)}
@@ -241,7 +233,6 @@ function SectionDashboard({ stats }) {
             </div>
           </div>
 
-          {/* Comparativa hoy / semana / mes */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' }}>
             {[
               { label: 'Hoy',         val: revenue?.daily?.total,   cnt: revenue?.daily?.count,   key: 'daily'   },
@@ -263,7 +254,6 @@ function SectionDashboard({ stats }) {
             ))}
           </div>
 
-          {/* Distribución neta */}
           {netRevenue && (
             <div style={{ padding: '28px 32px', borderTop: '1px solid var(--border)' }}>
               <div style={{ fontSize: '0.63rem', color: 'var(--white-muted)', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '16px' }}>
@@ -338,7 +328,6 @@ function SectionDashboard({ stats }) {
         </div>
       </div>
 
-      {/* ══ NIVEL 4 — Rendimiento de barberos ════════════════════ */}
       {barberStats && (
         <div>
           <p style={{ fontSize: '0.65rem', color: 'var(--white-muted)', letterSpacing: '0.25em', textTransform: 'uppercase', margin: '0 0 14px' }}>Rendimiento de barberos</p>
@@ -348,11 +337,9 @@ function SectionDashboard({ stats }) {
         </div>
       )}
 
-      {/* ══ NIVEL 5 — Detalle: top servicios, productos, gráfico ═ */}
       <div>
         <p style={{ fontSize: '0.65rem', color: 'var(--white-muted)', letterSpacing: '0.25em', textTransform: 'uppercase', margin: '0 0 14px' }}>Detalle este mes</p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px', marginBottom: '2px' }}>
-
           <div style={{ background: 'var(--black-card)', border: '1px solid var(--border)', padding: '28px' }}>
             <div style={{ fontSize: '0.63rem', color: 'var(--white-muted)', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '20px' }}>✂ Servicios más vendidos</div>
             {!revenue?.topServices?.length ? (
@@ -418,7 +405,6 @@ function SectionDashboard({ stats }) {
           </div>
         </div>
 
-        {/* Gráfico semanal — ancho completo */}
         <div style={{ background: 'var(--black-card)', border: '1px solid var(--border)', padding: '32px' }}>
           <div style={{ fontSize: '0.63rem', color: 'var(--white-muted)', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '28px' }}>Ventas por día · esta semana</div>
           {!revenue?.byDay?.length ? (
@@ -682,7 +668,6 @@ function SectionUsers() {
         }}>{msg}</div>
       )}
 
-      {/* Tabs */}
       <div style={{ display: 'flex', gap: '0', marginBottom: '24px', borderBottom: '1px solid var(--border)' }}>
         {[
           { key: 'client', label: `Clientes (${clients.length})` },
@@ -698,7 +683,6 @@ function SectionUsers() {
         ))}
       </div>
 
-      {/* Búsqueda */}
       <div style={{ marginBottom: '24px' }}>
         <input
           placeholder={`🔍 Buscar ${tab === 'client' ? 'cliente' : 'barbero'} por nombre, correo o teléfono...`}
@@ -754,11 +738,9 @@ function SectionUsers() {
                   fontSize: '0.65rem', color: u.is_active ? '#6ee7b7' : '#fc8181',
                   letterSpacing: '0.1em', textTransform: 'uppercase',
                 }}>{u.is_active ? 'Activo' : 'Inactivo'}</div>
-
                 <button onClick={() => openEdit(u)} className="btn-gold" style={{ padding: '6px 14px', fontSize: '0.7rem' }} disabled={actionLoading}>
                   Editar
                 </button>
-
                 {u.role !== 'admin' && (
                   <button
                     onClick={() => toggleStatus(u.id, u.is_active, u.is_active ? 'deactivate' : 'reactivate')}
@@ -781,7 +763,6 @@ function SectionUsers() {
         </div>
       )}
 
-      {/* Modal edición */}
       {editing && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 2000,
@@ -834,7 +815,6 @@ function SectionUsers() {
               <div style={{ height: '1px', background: 'var(--border)', margin: '4px 0' }}/>
               <p style={{ fontSize: '0.7rem', color: 'var(--gold)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Nueva contraseña (opcional)</p>
 
-              {/* Campo contraseña con ojito */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--white-muted)', marginBottom: '6px' }}>
                   Dejar vacío para no cambiar
@@ -857,12 +837,10 @@ function SectionUsers() {
                       transform: 'translateY(-50%)',
                       background: 'none', border: 'none', cursor: 'pointer',
                       padding: '4px', color: 'var(--white-muted)', display: 'flex',
-                      alignItems: 'center', justifyContent: 'center',
-                      transition: 'color 0.2s',
+                      alignItems: 'center', justifyContent: 'center', transition: 'color 0.2s',
                     }}
                     onMouseEnter={e => e.currentTarget.style.color = 'var(--gold)'}
                     onMouseLeave={e => e.currentTarget.style.color = 'var(--white-muted)'}
-                    aria-label={showNewPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                   >
                     {showNewPassword ? (
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -939,8 +917,6 @@ function SectionBarbers() {
         {success && <div style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', padding: '12px 16px', marginBottom: '24px', fontSize: '0.85rem', color: '#6ee7b7' }}>{success}</div>}
         {error   && <div style={{ background: 'rgba(220,38,38,0.1)',  border: '1px solid rgba(220,38,38,0.3)',  padding: '12px 16px', marginBottom: '24px', fontSize: '0.85rem', color: '#fc8181' }}>{error}</div>}
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-          {/* Campos normales */}
           {[
             { name: 'name',             label: 'Nombre completo',  type: 'text',   required: true  },
             { name: 'email',            label: 'Correo',           type: 'email',  required: true  },
@@ -956,7 +932,6 @@ function SectionBarbers() {
             </div>
           ))}
 
-          {/* Contraseña con ojito */}
           <div>
             <label style={{ display: 'block', fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--white-muted)', marginBottom: '8px' }}>
               Contraseña
@@ -979,12 +954,10 @@ function SectionBarbers() {
                   transform: 'translateY(-50%)',
                   background: 'none', border: 'none', cursor: 'pointer',
                   padding: '4px', color: 'var(--white-muted)', display: 'flex',
-                  alignItems: 'center', justifyContent: 'center',
-                  transition: 'color 0.2s',
+                  alignItems: 'center', justifyContent: 'center', transition: 'color 0.2s',
                 }}
                 onMouseEnter={e => e.currentTarget.style.color = 'var(--gold)'}
                 onMouseLeave={e => e.currentTarget.style.color = 'var(--white-muted)'}
-                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
               >
                 {showPassword ? (
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -1259,7 +1232,7 @@ function BarberStatsTable({ barbers }) {
   const [period, setPeriod] = useState('today')
 
   const periods = [
-    { key: 'today', label: 'Hoy',        cutsKey: 'cuts_today',  revKey: 'revenue_today'  },
+    { key: 'today', label: 'Hoy',         cutsKey: 'cuts_today',  revKey: 'revenue_today'  },
     { key: 'week',  label: 'Esta semana', cutsKey: 'cuts_week',   revKey: 'revenue_week'   },
     { key: 'month', label: 'Este mes',    cutsKey: 'cuts_month',  revKey: 'revenue_month'  },
   ]
@@ -1270,7 +1243,6 @@ function BarberStatsTable({ barbers }) {
 
   return (
     <div>
-      {/* Tabs período */}
       <div style={{ display: 'flex', gap: '4px', marginBottom: '24px' }}>
         {periods.map(p => (
           <button key={p.key} onClick={() => setPeriod(p.key)} style={{
@@ -1283,14 +1255,11 @@ function BarberStatsTable({ barbers }) {
           }}>{p.label}</button>
         ))}
       </div>
-
-      {/* Lista de barberos */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {sorted.map((b, i) => (
           <div key={b.barber_name}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                {/* Ranking */}
                 <div style={{
                   width: '28px', height: '28px',
                   background: i === 0 ? 'linear-gradient(135deg, var(--gold-dark), var(--gold))' : 'var(--black-soft)',
@@ -1313,8 +1282,6 @@ function BarberStatsTable({ barbers }) {
                 <div style={{ fontSize: '0.65rem', color: 'var(--white-muted)' }}>cortes</div>
               </div>
             </div>
-
-            {/* Barra de progreso */}
             <div style={{ height: '4px', background: 'var(--black-soft)', borderRadius: '2px', overflow: 'hidden' }}>
               <div style={{
                 height: '100%',
@@ -1322,17 +1289,17 @@ function BarberStatsTable({ barbers }) {
                 background: i === 0
                   ? 'linear-gradient(90deg, var(--gold-dark), var(--gold))'
                   : i === 1 ? 'rgba(201,168,76,0.5)' : 'rgba(201,168,76,0.25)',
-                borderRadius: '2px',
-                transition: 'width 0.6s ease',
+                borderRadius: '2px', transition: 'width 0.6s ease',
               }}/>
             </div>
-            
           </div>
         ))}
       </div>
     </div>
   )
 }
+
+// ── Tienda ─────────────────────────────────────────────────────
 function SectionShop() {
   const [products, setProducts] = useState([])
   const [orders,   setOrders]   = useState([])
@@ -1370,32 +1337,16 @@ function SectionShop() {
     } finally { setSaving(false) }
   }
 
-  const toggleActive = async (p) => {
-    await api.put(`/shop/products/${p.id}`, { is_active: p.is_active ? 0 : 1 })
-    api.get('/shop/products').then(r => setProducts(r.data.data.products))
-  }
-
   const openEdit = (p) => {
     setEditing(p)
-    setEditForm({
-      name:        p.name,
-      description: p.description || '',
-      category:    p.category,
-      price:       p.price,
-      stock:       p.stock,
-      image_url:   p.image_url || '',
-    })
+    setEditForm({ name: p.name, description: p.description || '', category: p.category, price: p.price, stock: p.stock, image_url: p.image_url || '' })
     setEditMsg('')
   }
 
   const handleUpdate = async e => {
     e.preventDefault(); setEditSaving(true); setEditMsg('')
     try {
-      await api.put(`/shop/products/${editing.id}`, {
-        ...editForm,
-        price: Number(editForm.price),
-        stock: Number(editForm.stock),
-      })
+      await api.put(`/shop/products/${editing.id}`, { ...editForm, price: Number(editForm.price), stock: Number(editForm.stock) })
       setEditMsg('✓ Producto actualizado')
       api.get('/shop/products').then(r => setProducts(r.data.data.products))
     } catch (err) {
@@ -1413,11 +1364,8 @@ function SectionShop() {
     try {
       const { data } = await api.get(`/shop/orders/${id}`)
       setOrderDetail(data.data.order)
-    } catch (err) {
-      alert('Error al cargar la orden')
-    } finally {
-      setOrderDetailLoading(false)
-    }
+    } catch { alert('Error al cargar la orden') }
+    finally { setOrderDetailLoading(false) }
   }
 
   const CATEGORY_LABEL = { accesorios: 'Accesorios', ropa: 'Ropa', barberia: 'Barbería' }
@@ -1446,7 +1394,6 @@ function SectionShop() {
         Gestión de Tienda
       </h2>
 
-      {/* Tabs */}
       <div style={{ display: 'flex', gap: '0', marginBottom: '32px', borderBottom: '1px solid var(--border)' }}>
         {[
           { key: 'products', label: `Productos (${products.length})` },
@@ -1463,50 +1410,27 @@ function SectionShop() {
         ))}
       </div>
 
-      {/* Banner sin stock */}
       {outOfStock.length > 0 && (
-        <div style={{
-          background: 'rgba(245,158,11,0.08)',
-          border: '1px solid rgba(245,158,11,0.3)',
-          padding: '14px 20px', marginBottom: '24px',
-          display: 'flex', flexDirection: 'column', gap: '6px',
-        }}>
-          <div style={{ fontSize: '0.75rem', color: '#F59E0B', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '4px' }}>
-            ⚠ Productos sin stock
-          </div>
+        <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.3)', padding: '14px 20px', marginBottom: '24px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div style={{ fontSize: '0.75rem', color: '#F59E0B', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '4px' }}>⚠ Productos sin stock</div>
           {outOfStock.map(p => (
             <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '0.85rem', color: 'var(--white)' }}>{p.name}</span>
-              <button className="btn-gold" onClick={() => { openEdit(p); setTab('products') }}
-                style={{ padding: '4px 12px', fontSize: '0.65rem' }}>
-                Actualizar stock
-              </button>
+              <button className="btn-gold" onClick={() => { openEdit(p); setTab('products') }} style={{ padding: '4px 12px', fontSize: '0.65rem' }}>Actualizar stock</button>
             </div>
           ))}
         </div>
       )}
 
-      {/* Tab productos */}
       {tab === 'products' && (
         <div>
           <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
-            <input
-              placeholder=" Buscar producto..."
-              value={search} onChange={e => setSearch(e.target.value)}
-              style={{
-                flex: 1, minWidth: '200px', padding: '10px 16px',
-                background: 'var(--black)', border: '1px solid var(--border)',
-                color: 'var(--white)', fontSize: '0.85rem', outline: 'none',
-                fontFamily: 'DM Sans, sans-serif',
-              }}
-              onFocus={e => e.target.style.borderColor = 'var(--gold)'}
-              onBlur={e  => e.target.style.borderColor = 'var(--border)'}
-            />
+            <input placeholder=" Buscar producto..." value={search} onChange={e => setSearch(e.target.value)}
+              style={{ flex: 1, minWidth: '200px', padding: '10px 16px', background: 'var(--black)', border: '1px solid var(--border)', color: 'var(--white)', fontSize: '0.85rem', outline: 'none', fontFamily: 'DM Sans, sans-serif' }}
+              onFocus={e => e.target.style.borderColor = 'var(--gold)'} onBlur={e => e.target.style.borderColor = 'var(--border)'} />
             {['', 'accesorios', 'ropa', 'barberia'].map(cat => (
-              <button key={cat} onClick={() => setCatFilter(cat)}
-                className={catFilter === cat ? 'btn-gold' : 'btn-outline'}
-                style={{ padding: '8px 16px', fontSize: '0.72rem' }}>
-                {cat === '' ? 'Todos' : cat === 'accesorios' ? ' Accesorios' : cat === 'ropa' ? ' Ropa' : 'Cuidado Personal'}
+              <button key={cat} onClick={() => setCatFilter(cat)} className={catFilter === cat ? 'btn-gold' : 'btn-outline'} style={{ padding: '8px 16px', fontSize: '0.72rem' }}>
+                {cat === '' ? 'Todos' : cat === 'accesorios' ? 'Accesorios' : cat === 'ropa' ? 'Ropa' : 'Cuidado Personal'}
               </button>
             ))}
           </div>
@@ -1516,18 +1440,9 @@ function SectionShop() {
               <p style={{ color: 'var(--white-muted)' }}>No se encontraron productos</p>
             </div>
           ) : (
-            Object.entries(
-              filteredProducts.reduce((acc, p) => {
-                if (!acc[p.category]) acc[p.category] = []
-                acc[p.category].push(p)
-                return acc
-              }, {})
-            ).map(([cat, prods]) => (
+            Object.entries(filteredProducts.reduce((acc, p) => { if (!acc[p.category]) acc[p.category] = []; acc[p.category].push(p); return acc }, {})).map(([cat, prods]) => (
               <div key={cat} style={{ marginBottom: '32px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                  <span style={{ fontSize: '1rem' }}>
-                    {cat === 'accesorios' ? '' : cat === 'ropa' ? '' : ''}
-                  </span>
                   <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1rem', color: 'var(--gold)', margin: 0 }}>
                     {CATEGORY_LABEL[cat]} <span style={{ fontSize: '0.72rem', color: 'var(--white-muted)', fontFamily: 'DM Sans, sans-serif' }}>({prods.length})</span>
                   </h3>
@@ -1535,54 +1450,24 @@ function SectionShop() {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                   {prods.map(p => (
-                    <div key={p.id} style={{
-                      background: 'var(--black-card)', border: '1px solid var(--border)',
-                      padding: '16px 20px', display: 'flex', justifyContent: 'space-between',
-                      alignItems: 'center', flexWrap: 'wrap', gap: '12px', transition: 'border-color 0.3s',
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)'}
-                    onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}>
+                    <div key={p.id} style={{ background: 'var(--black-card)', border: '1px solid var(--border)', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', transition: 'border-color 0.3s' }}
+                      onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)'}
+                      onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}>
                       <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                        <div style={{
-                          width: '48px', height: '48px', background: 'var(--black-soft)',
-                          border: '1px solid var(--border)', overflow: 'hidden', flexShrink: 0,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem',
-                        }}>
-                          {p.image_url
-                            ? <img src={p.image_url} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
-                            : (cat === 'accesorios' ? '' : cat === 'ropa' ? '' : '')
-                          }
+                        <div style={{ width: '48px', height: '48px', background: 'var(--black-soft)', border: '1px solid var(--border)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}>
+                          {p.image_url ? <img src={p.image_url} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/> : '📦'}
                         </div>
                         <div>
                           <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '0.95rem', color: 'var(--white)', marginBottom: '3px' }}>{p.name}</div>
-                          {p.description && (
-                            <div style={{ fontSize: '0.72rem', color: 'var(--white-muted)', marginBottom: '3px', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {p.description}
-                            </div>
-                          )}
-                          <span style={{ fontSize: '0.68rem', color: p.stock < 5 ? '#F59E0B' : 'var(--white-muted)' }}>
-                            {p.stock === 0 ? '✕ Sin stock' : `Stock: ${p.stock}`}
-                          </span>
+                          {p.description && <div style={{ fontSize: '0.72rem', color: 'var(--white-muted)', marginBottom: '3px', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.description}</div>}
+                          <span style={{ fontSize: '0.68rem', color: p.stock < 5 ? '#F59E0B' : 'var(--white-muted)' }}>{p.stock === 0 ? '✕ Sin stock' : `Stock: ${p.stock}`}</span>
                         </div>
                       </div>
                       <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                        <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.2rem', color: 'var(--gold)' }}>
-                          ${Number(p.price).toLocaleString('es-CO')}
-                        </div>
-                        <button onClick={() => openEdit(p)} className="btn-gold" style={{ padding: '6px 14px', fontSize: '0.68rem' }}>
-                          Editar
-                        </button>
-                        <button onClick={() => {
-                          if (confirm('¿Eliminar este producto permanentemente?')) {
-                            api.put(`/shop/products/${p.id}`, { is_active: 0 }).then(() =>
-                              api.get('/shop/products').then(r => setProducts(r.data.data.products))
-                            )
-                          }
-                        }} style={{
-                          background: 'none', border: '1px solid rgba(239,68,68,0.3)', color: '#fc8181',
-                          padding: '6px 12px', fontSize: '0.68rem', cursor: 'pointer',
-                          letterSpacing: '0.1em', textTransform: 'uppercase', transition: 'all 0.3s',
-                        }}>
+                        <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.2rem', color: 'var(--gold)' }}>${Number(p.price).toLocaleString('es-CO')}</div>
+                        <button onClick={() => openEdit(p)} className="btn-gold" style={{ padding: '6px 14px', fontSize: '0.68rem' }}>Editar</button>
+                        <button onClick={() => { if (confirm('¿Eliminar este producto?')) api.put(`/shop/products/${p.id}`, { is_active: 0 }).then(() => api.get('/shop/products').then(r => setProducts(r.data.data.products))) }}
+                          style={{ background: 'none', border: '1px solid rgba(239,68,68,0.3)', color: '#fc8181', padding: '6px 12px', fontSize: '0.68rem', cursor: 'pointer', letterSpacing: '0.1em', textTransform: 'uppercase', transition: 'all 0.3s' }}>
                           Eliminar
                         </button>
                       </div>
@@ -1595,52 +1480,36 @@ function SectionShop() {
         </div>
       )}
 
-      {/* Tab agregar producto */}
       {tab === 'add' && (
         <div style={{ maxWidth: '520px' }}>
-          {msg && (
-            <div style={{
-              padding: '10px 14px', marginBottom: '20px', fontSize: '0.82rem',
-              background: msg.startsWith('✓') ? 'rgba(16,185,129,0.1)' : 'rgba(220,38,38,0.1)',
-              border: `1px solid ${msg.startsWith('✓') ? 'rgba(16,185,129,0.3)' : 'rgba(220,38,38,0.3)'}`,
-              color: msg.startsWith('✓') ? '#6ee7b7' : '#fc8181',
-            }}>{msg}</div>
-          )}
+          {msg && <div style={{ padding: '10px 14px', marginBottom: '20px', fontSize: '0.82rem', background: msg.startsWith('✓') ? 'rgba(16,185,129,0.1)' : 'rgba(220,38,38,0.1)', border: `1px solid ${msg.startsWith('✓') ? 'rgba(16,185,129,0.3)' : 'rgba(220,38,38,0.3)'}`, color: msg.startsWith('✓') ? '#6ee7b7' : '#fc8181' }}>{msg}</div>}
           <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {[
-              { key: 'name',        label: 'Nombre',      type: 'text',   required: true  },
-              { key: 'description', label: 'Descripción', type: 'text',   required: false },
-              { key: 'price',       label: 'Precio',      type: 'number', required: true  },
-              { key: 'stock',       label: 'Stock',       type: 'number', required: true  },
-              { key: 'image_url',   label: 'URL imagen',  type: 'url',    required: false },
+              { key: 'name', label: 'Nombre', type: 'text', required: true },
+              { key: 'description', label: 'Descripción', type: 'text', required: false },
+              { key: 'price', label: 'Precio', type: 'number', required: true },
+              { key: 'stock', label: 'Stock', type: 'number', required: true },
+              { key: 'image_url', label: 'URL imagen', type: 'url', required: false },
             ].map(f => (
               <div key={f.key}>
                 <label style={{ display: 'block', fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--white-muted)', marginBottom: '6px' }}>{f.label}</label>
-                <input type={f.type} value={form[f.key]} required={f.required}
-                  onChange={e => setForm({ ...form, [f.key]: e.target.value })}
-                  style={inputStyle}
-                  onFocus={e => e.target.style.borderColor = 'var(--gold)'}
-                  onBlur={e  => e.target.style.borderColor = 'var(--border)'}
-                />
+                <input type={f.type} value={form[f.key]} required={f.required} onChange={e => setForm({ ...form, [f.key]: e.target.value })}
+                  style={inputStyle} onFocus={e => e.target.style.borderColor = 'var(--gold)'} onBlur={e => e.target.style.borderColor = 'var(--border)'} />
               </div>
             ))}
             <div>
               <label style={{ display: 'block', fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--white-muted)', marginBottom: '6px' }}>Categoría</label>
-              <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}
-                style={{ ...inputStyle, cursor: 'pointer' }}>
+              <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} style={{ ...inputStyle, cursor: 'pointer' }}>
                 <option value="accesorios">Accesorios</option>
                 <option value="ropa">Ropa</option>
                 <option value="barberia">Cuidado Personal</option>
               </select>
             </div>
-            <button type="submit" className="btn-gold" disabled={saving} style={{ marginTop: '8px', opacity: saving ? 0.7 : 1 }}>
-              {saving ? 'Creando...' : 'Crear Producto'}
-            </button>
+            <button type="submit" className="btn-gold" disabled={saving} style={{ marginTop: '8px', opacity: saving ? 0.7 : 1 }}>{saving ? 'Creando...' : 'Crear Producto'}</button>
           </form>
         </div>
       )}
 
-      {/* Tab pedidos */}
       {tab === 'orders' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
           {orders.length === 0 ? (
@@ -1650,46 +1519,21 @@ function SectionShop() {
           ) : orders.map(o => {
             const sc = STATUS_COLOR[o.status] || '#6B7280'
             return (
-              <div key={o.id}
-                onClick={() => openOrderDetail(o.id)}
-                style={{
-                  background: 'var(--black-card)', border: '1px solid var(--border)',
-                  padding: '16px 20px', display: 'flex', justifyContent: 'space-between',
-                  alignItems: 'center', flexWrap: 'wrap', gap: '12px',
-                  cursor: 'pointer', transition: 'border-color 0.3s',
-                }}
+              <div key={o.id} onClick={() => openOrderDetail(o.id)}
+                style={{ background: 'var(--black-card)', border: '1px solid var(--border)', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', cursor: 'pointer', transition: 'border-color 0.3s' }}
                 onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)'}
                 onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}>
                 <div>
-                  <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '0.95rem', color: 'var(--white)', marginBottom: '2px' }}>
-                    Orden #{o.id} — {o.client_name}
-                  </div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--white-muted)' }}>
-                    {o.item_count} productos · {new Date(o.created_at).toLocaleDateString('es-CO')}
-                  </div>
+                  <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '0.95rem', color: 'var(--white)', marginBottom: '2px' }}>Orden #{o.id} — {o.client_name}</div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--white-muted)' }}>{o.item_count} productos · {new Date(o.created_at).toLocaleDateString('es-CO')}</div>
                 </div>
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                  <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.1rem', color: 'var(--gold)' }}>
-                    ${Number(o.total).toLocaleString('es-CO')}
-                  </div>
-                  <div style={{ padding: '4px 10px', border: `1px solid ${sc}33`, background: `${sc}11`, fontSize: '0.68rem', color: sc, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                    {STATUS_LABEL[o.status]}
-                  </div>
+                  <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.1rem', color: 'var(--gold)' }}>${Number(o.total).toLocaleString('es-CO')}</div>
+                  <div style={{ padding: '4px 10px', border: `1px solid ${sc}33`, background: `${sc}11`, fontSize: '0.68rem', color: sc, letterSpacing: '0.1em', textTransform: 'uppercase' }}>{STATUS_LABEL[o.status]}</div>
                   {o.status === 'pending' && (
                     <>
-                      <button className="btn-gold"
-                        onClick={e => { e.stopPropagation(); updateStatus(o.id, 'completed') }}
-                        style={{ padding: '6px 12px', fontSize: '0.68rem' }}>
-                        Completar
-                      </button>
-                      <button
-                        onClick={e => { e.stopPropagation(); updateStatus(o.id, 'cancelled') }}
-                        style={{
-                          background: 'none', border: '1px solid rgba(239,68,68,0.3)', color: '#fc8181',
-                          padding: '6px 12px', fontSize: '0.68rem', cursor: 'pointer', transition: 'all 0.3s',
-                        }}>
-                        Cancelar
-                      </button>
+                      <button className="btn-gold" onClick={e => { e.stopPropagation(); updateStatus(o.id, 'completed') }} style={{ padding: '6px 12px', fontSize: '0.68rem' }}>Completar</button>
+                      <button onClick={e => { e.stopPropagation(); updateStatus(o.id, 'cancelled') }} style={{ background: 'none', border: '1px solid rgba(239,68,68,0.3)', color: '#fc8181', padding: '6px 12px', fontSize: '0.68rem', cursor: 'pointer', transition: 'all 0.3s' }}>Cancelar</button>
                     </>
                   )}
                 </div>
@@ -1699,154 +1543,256 @@ function SectionShop() {
         </div>
       )}
 
-      {/* Modal editar producto */}
       {editing && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 2000,
-          background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
-        }} onClick={e => { if (e.target === e.currentTarget) setEditing(null) }}>
-          <div style={{
-            background: 'var(--black-soft)', border: '1px solid var(--border)',
-            width: '100%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto', padding: '40px',
-          }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
+          onClick={e => { if (e.target === e.currentTarget) setEditing(null) }}>
+          <div style={{ background: 'var(--black-soft)', border: '1px solid var(--border)', width: '100%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto', padding: '40px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
               <div>
                 <span className="section-label">✦ Editando producto</span>
-                <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.2rem', color: 'var(--white)', marginTop: '4px' }}>
-                  {editing.name}
-                </h3>
+                <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.2rem', color: 'var(--white)', marginTop: '4px' }}>{editing.name}</h3>
               </div>
-              <button onClick={() => setEditing(null)}
-                style={{ background: 'none', border: 'none', color: 'var(--white-muted)', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
+              <button onClick={() => setEditing(null)} style={{ background: 'none', border: 'none', color: 'var(--white-muted)', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
             </div>
             <form onSubmit={handleUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {[
-                { key: 'name',        label: 'Nombre',      type: 'text',   required: true  },
-                { key: 'description', label: 'Descripción', type: 'text',   required: false },
-                { key: 'price',       label: 'Precio',      type: 'number', required: true  },
-                { key: 'stock',       label: 'Stock',       type: 'number', required: true  },
-                { key: 'image_url',   label: 'URL imagen',  type: 'url',    required: false },
+                { key: 'name', label: 'Nombre', type: 'text', required: true },
+                { key: 'description', label: 'Descripción', type: 'text', required: false },
+                { key: 'price', label: 'Precio', type: 'number', required: true },
+                { key: 'stock', label: 'Stock', type: 'number', required: true },
+                { key: 'image_url', label: 'URL imagen', type: 'url', required: false },
               ].map(f => (
                 <div key={f.key}>
                   <label style={{ display: 'block', fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--white-muted)', marginBottom: '6px' }}>{f.label}</label>
-                  <input type={f.type} value={editForm[f.key]} required={f.required}
-                    onChange={e => setEditForm({ ...editForm, [f.key]: e.target.value })}
-                    style={inputStyle}
-                    onFocus={e => e.target.style.borderColor = 'var(--gold)'}
-                    onBlur={e  => e.target.style.borderColor = 'var(--border)'}
-                  />
+                  <input type={f.type} value={editForm[f.key]} required={f.required} onChange={e => setEditForm({ ...editForm, [f.key]: e.target.value })}
+                    style={inputStyle} onFocus={e => e.target.style.borderColor = 'var(--gold)'} onBlur={e => e.target.style.borderColor = 'var(--border)'} />
                 </div>
               ))}
               <div>
                 <label style={{ display: 'block', fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--white-muted)', marginBottom: '6px' }}>Categoría</label>
-                <select value={editForm.category} onChange={e => setEditForm({ ...editForm, category: e.target.value })}
-                  style={{ ...inputStyle, cursor: 'pointer' }}>
+                <select value={editForm.category} onChange={e => setEditForm({ ...editForm, category: e.target.value })} style={{ ...inputStyle, cursor: 'pointer' }}>
                   <option value="accesorios">Accesorios</option>
                   <option value="ropa">Ropa</option>
                   <option value="barberia">Cuidado Personal</option>
                 </select>
               </div>
-              {editMsg && (
-                <div style={{
-                  padding: '10px 14px', fontSize: '0.82rem',
-                  background: editMsg.startsWith('✓') ? 'rgba(16,185,129,0.1)' : 'rgba(220,38,38,0.1)',
-                  border: `1px solid ${editMsg.startsWith('✓') ? 'rgba(16,185,129,0.3)' : 'rgba(220,38,38,0.3)'}`,
-                  color: editMsg.startsWith('✓') ? '#6ee7b7' : '#fc8181',
-                }}>{editMsg}</div>
-              )}
+              {editMsg && <div style={{ padding: '10px 14px', fontSize: '0.82rem', background: editMsg.startsWith('✓') ? 'rgba(16,185,129,0.1)' : 'rgba(220,38,38,0.1)', border: `1px solid ${editMsg.startsWith('✓') ? 'rgba(16,185,129,0.3)' : 'rgba(220,38,38,0.3)'}`, color: editMsg.startsWith('✓') ? '#6ee7b7' : '#fc8181' }}>{editMsg}</div>}
               <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
                 <button type="button" className="btn-outline" onClick={() => setEditing(null)} style={{ flex: 1 }}>Cancelar</button>
-                <button type="submit" className="btn-gold" disabled={editSaving} style={{ flex: 1, opacity: editSaving ? 0.7 : 1 }}>
-                  {editSaving ? 'Guardando...' : 'Guardar cambios'}
-                </button>
+                <button type="submit" className="btn-gold" disabled={editSaving} style={{ flex: 1, opacity: editSaving ? 0.7 : 1 }}>{editSaving ? 'Guardando...' : 'Guardar cambios'}</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* Modal detalle de orden */}
       {orderDetail && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 2000,
-          background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
-        }} onClick={e => { if (e.target === e.currentTarget) setOrderDetail(null) }}>
-          <div style={{
-            background: 'var(--black-soft)', border: '1px solid var(--border)',
-            width: '100%', maxWidth: '520px', maxHeight: '90vh', overflowY: 'auto', padding: '40px',
-          }}>
-            {/* Header */}
+        <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
+          onClick={e => { if (e.target === e.currentTarget) setOrderDetail(null) }}>
+          <div style={{ background: 'var(--black-soft)', border: '1px solid var(--border)', width: '100%', maxWidth: '520px', maxHeight: '90vh', overflowY: 'auto', padding: '40px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
               <div>
                 <span className="section-label">✦ Detalle</span>
-                <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.2rem', color: 'var(--white)', marginTop: '4px' }}>
-                  Orden #{orderDetail.id} — {orderDetail.client_name}
-                </h3>
-                <div style={{ fontSize: '0.72rem', color: 'var(--white-muted)', marginTop: '4px' }}>
-                  {new Date(orderDetail.created_at).toLocaleDateString('es-CO', { dateStyle: 'long' })}
-                </div>
+                <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.2rem', color: 'var(--white)', marginTop: '4px' }}>Orden #{orderDetail.id} — {orderDetail.client_name}</h3>
+                <div style={{ fontSize: '0.72rem', color: 'var(--white-muted)', marginTop: '4px' }}>{new Date(orderDetail.created_at).toLocaleDateString('es-CO', { dateStyle: 'long' })}</div>
               </div>
-              <button onClick={() => setOrderDetail(null)}
-                style={{ background: 'none', border: 'none', color: 'var(--white-muted)', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
+              <button onClick={() => setOrderDetail(null)} style={{ background: 'none', border: 'none', color: 'var(--white-muted)', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
             </div>
-
-            {/* Items */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginBottom: '24px' }}>
               {orderDetail.items.map((item, i) => (
-                <div key={i} style={{
-                  background: 'var(--black-card)', border: '1px solid var(--border)',
-                  padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px',
-                }}>
+                <div key={i} style={{ background: 'var(--black-card)', border: '1px solid var(--border)', padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
                   <div>
                     <div style={{ fontSize: '0.88rem', color: 'var(--white)', marginBottom: '3px' }}>{item.product_name}</div>
-                    <div style={{ fontSize: '0.68rem', color: 'var(--white-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                      {CATEGORY_LABEL[item.category] || item.category}
-                    </div>
+                    <div style={{ fontSize: '0.68rem', color: 'var(--white-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{CATEGORY_LABEL[item.category] || item.category}</div>
                   </div>
                   <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--white-muted)', marginBottom: '2px' }}>
-                      {item.quantity} × ${Number(item.unit_price).toLocaleString('es-CO')}
-                    </div>
-                    <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1rem', color: 'var(--gold)' }}>
-                      ${Number(item.unit_price * item.quantity).toLocaleString('es-CO')}
-                    </div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--white-muted)', marginBottom: '2px' }}>{item.quantity} × ${Number(item.unit_price).toLocaleString('es-CO')}</div>
+                    <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1rem', color: 'var(--gold)' }}>${Number(item.unit_price * item.quantity).toLocaleString('es-CO')}</div>
                   </div>
                 </div>
               ))}
             </div>
-
-            {/* Notas */}
-            {orderDetail.notes && (
-              <div style={{
-                background: 'var(--black-card)', border: '1px solid var(--border)',
-                padding: '12px 16px', marginBottom: '20px', fontSize: '0.82rem', color: 'var(--white-muted)',
-              }}>
-                📝 {orderDetail.notes}
-              </div>
-            )}
-
-            {/* Total */}
+            {orderDetail.notes && <div style={{ background: 'var(--black-card)', border: '1px solid var(--border)', padding: '12px 16px', marginBottom: '20px', fontSize: '0.82rem', color: 'var(--white-muted)' }}>📝 {orderDetail.notes}</div>}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: '20px' }}>
               <span style={{ fontSize: '0.82rem', color: 'var(--white-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Total</span>
-              <span style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.5rem', color: 'var(--gold)' }}>
-                ${Number(orderDetail.total).toLocaleString('es-CO')}
-              </span>
+              <span style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.5rem', color: 'var(--gold)' }}>${Number(orderDetail.total).toLocaleString('es-CO')}</span>
             </div>
           </div>
         </div>
       )}
 
-      {/* Loader detalle orden */}
       {orderDetailLoading && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 2000,
-          background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <div style={{ color: 'var(--gold)', fontFamily: 'Playfair Display, serif', fontSize: '1rem' }}>
-            Cargando orden...
+        <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ color: 'var(--gold)', fontFamily: 'Playfair Display, serif', fontSize: '1rem' }}>Cargando orden...</div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Servicios ──────────────────────────────────────────────────
+function SectionServices() {
+  const [services, setServices] = useState([])
+  const [loading,  setLoading]  = useState(true)
+  const [editing,  setEditing]  = useState(null)
+  const [form,     setForm]     = useState({ name: '', description: '', duration_minutes: '', price: '', display_order: '' })
+  const [saving,   setSaving]   = useState(false)
+  const [msg,      setMsg]      = useState('')
+
+  const inputStyle = {
+    width: '100%', padding: '10px 14px',
+    background: 'var(--black)', border: '1px solid var(--border)',
+    color: 'var(--white)', fontSize: '0.85rem', outline: 'none',
+    fontFamily: 'DM Sans, sans-serif', boxSizing: 'border-box', transition: 'border-color 0.3s',
+  }
+
+  const fetchServices = async () => {
+    setLoading(true)
+    try {
+      const { data } = await api.get('/admin/services')
+      setServices(data.data.services)
+    } catch (err) { console.error(err) }
+    finally { setLoading(false) }
+  }
+
+  useEffect(() => { fetchServices() }, [])
+
+  const openCreate = () => {
+    setForm({ name: '', description: '', duration_minutes: '', price: '', display_order: '' })
+    setMsg('')
+    setEditing('create')
+  }
+
+  const openEdit = (svc) => {
+    setForm({ name: svc.name, description: svc.description || '', duration_minutes: svc.duration_minutes, price: svc.price, display_order: svc.display_order || 0 })
+    setMsg('')
+    setEditing(svc)
+  }
+
+  const closeModal = () => setEditing(null)
+
+  const handleSave = async () => {
+    if (!form.name || !form.price || !form.duration_minutes) {
+      setMsg('✗ Nombre, precio y duración son obligatorios')
+      return
+    }
+    setSaving(true); setMsg('')
+    try {
+      const payload = { ...form, price: parseFloat(form.price), duration_minutes: parseInt(form.duration_minutes), display_order: parseInt(form.display_order) || 0 }
+      if (editing === 'create') {
+        await api.post('/admin/services', payload)
+        setMsg('✓ Servicio creado correctamente')
+      } else {
+        await api.put(`/admin/services/${editing.id}`, payload)
+        setMsg('✓ Servicio actualizado correctamente')
+      }
+      await fetchServices()
+      setTimeout(closeModal, 800)
+    } catch (err) {
+      setMsg('✗ ' + (err.response?.data?.error || 'Error al guardar'))
+    } finally { setSaving(false) }
+  }
+
+  const handleDelete = async (svc) => {
+    if (!confirm(`¿Desactivar el servicio "${svc.name}"?`)) return
+    try {
+      await api.delete(`/admin/services/${svc.id}`)
+      fetchServices()
+    } catch { alert('No se pudo desactivar') }
+  }
+
+  return (
+    <div>
+      <span className="section-label">✦ Gestión</span>
+      <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.8rem', color: 'var(--white)', margin: '8px 0 24px' }}>Servicios</h2>
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
+        <button className="btn-gold" onClick={openCreate} style={{ padding: '10px 24px', fontSize: '0.78rem' }}>
+          + Nuevo servicio
+        </button>
+      </div>
+
+      {loading ? (
+        <p style={{ color: 'var(--white-muted)', fontSize: '0.85rem' }}>Cargando...</p>
+      ) : services.length === 0 ? (
+        <div style={{ background: 'var(--black-card)', border: '1px solid var(--border)', padding: '48px', textAlign: 'center' }}>
+          <p style={{ color: 'var(--white-muted)' }}>No hay servicios activos</p>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          {services.map(svc => (
+            <div key={svc.id} style={{
+              background: 'var(--black-card)', border: '1px solid var(--border)',
+              padding: '20px 24px', display: 'flex', justifyContent: 'space-between',
+              alignItems: 'center', flexWrap: 'wrap', gap: '12px', transition: 'border-color 0.3s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                <div style={{
+                  width: '44px', height: '44px', flexShrink: 0,
+                  background: 'linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05))',
+                  border: '1px solid rgba(201,168,76,0.2)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem',
+                }}>✂</div>
+                <div>
+                  <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '0.95rem', color: 'var(--white)', marginBottom: '3px' }}>{svc.name}</div>
+                  {svc.description && <div style={{ fontSize: '0.72rem', color: 'var(--white-muted)', marginBottom: '3px', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{svc.description}</div>}
+                  <span style={{ fontSize: '0.68rem', color: 'var(--white-muted)' }}>⏱ {svc.duration_minutes} min</span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.2rem', color: 'var(--gold)' }}>
+                  ${Number(svc.price).toLocaleString('es-CO')}
+                </div>
+                <button onClick={() => openEdit(svc)} className="btn-gold" style={{ padding: '6px 14px', fontSize: '0.68rem' }}>Editar</button>
+                <button onClick={() => handleDelete(svc)} style={{
+                  background: 'none', border: '1px solid rgba(239,68,68,0.3)', color: '#fc8181',
+                  padding: '6px 12px', fontSize: '0.68rem', cursor: 'pointer',
+                  letterSpacing: '0.1em', textTransform: 'uppercase', transition: 'all 0.3s',
+                }}>Desactivar</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {editing && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
+          onClick={e => { if (e.target === e.currentTarget) closeModal() }}>
+          <div style={{ background: 'var(--black-soft)', border: '1px solid var(--border)', width: '100%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto', padding: '40px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
+              <div>
+                <span className="section-label">✦ {editing === 'create' ? 'Nuevo servicio' : 'Editando servicio'}</span>
+                {editing !== 'create' && <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.2rem', color: 'var(--white)', marginTop: '4px' }}>{editing.name}</h3>}
+              </div>
+              <button onClick={closeModal} style={{ background: 'none', border: 'none', color: 'var(--white-muted)', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {[
+                { key: 'name',             label: 'Nombre *',            type: 'text'   },
+                { key: 'description',      label: 'Descripción',         type: 'text'   },
+                { key: 'price',            label: 'Precio (COP) *',      type: 'number' },
+                { key: 'duration_minutes', label: 'Duración (min) *',    type: 'number' },
+                { key: 'display_order',    label: 'Orden visualización', type: 'number' },
+              ].map(f => (
+                <div key={f.key}>
+                  <label style={{ display: 'block', fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--white-muted)', marginBottom: '6px' }}>{f.label}</label>
+                  <input type={f.type} value={form[f.key]} onChange={e => setForm({ ...form, [f.key]: e.target.value })}
+                    style={inputStyle} onFocus={e => e.target.style.borderColor = 'var(--gold)'} onBlur={e => e.target.style.borderColor = 'var(--border)'} />
+                </div>
+              ))}
+
+              {msg && <div style={{ padding: '10px 14px', fontSize: '0.82rem', background: msg.startsWith('✓') ? 'rgba(16,185,129,0.1)' : 'rgba(220,38,38,0.1)', border: `1px solid ${msg.startsWith('✓') ? 'rgba(16,185,129,0.3)' : 'rgba(220,38,38,0.3)'}`, color: msg.startsWith('✓') ? '#6ee7b7' : '#fc8181' }}>{msg}</div>}
+
+              <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+                <button className="btn-outline" onClick={closeModal} style={{ flex: 1 }}>Cancelar</button>
+                <button className="btn-gold" onClick={handleSave} disabled={saving} style={{ flex: 1, opacity: saving ? 0.7 : 1 }}>
+                  {saving ? 'Guardando...' : editing === 'create' ? 'Crear servicio' : 'Guardar cambios'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
