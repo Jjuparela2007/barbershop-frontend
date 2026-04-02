@@ -551,7 +551,7 @@ function Contact() {
           {[
             { title: 'Ubicación', items: ['Calle 123 #45-67', 'Bogotá, Colombia'] },
             { title: 'Horario', items: ['Lun–Vie: 9am – 6pm', 'Sábado: 9am – 2pm', 'Domingo: Cerrado'] },
-            { title: 'Contacto', items: ['+57 313 861 4127', 'info@jjbarberstudio.com'] },
+            { title: 'Contacto', items: ['+57 313 861 4127', 'info@goldenhousebarber.com'] },
           ].map(col => (
             <div key={col.title}>
               <h4 style={{
