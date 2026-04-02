@@ -38,7 +38,7 @@ export default function AdminDashboard() {
     { key: 'horarios',     label: 'Horarios',       icon: '' },
     { key: 'ratings',      label: 'Calificaciones', icon: '' },
     { key: 'shop',         label: 'Tienda',         icon: '' },
-    { key: 'services',     label: 'Servicios',      icon: '✂' },
+    { key: 'services',     label: 'Servicios',      icon: '' },
   ]
 
   return (
