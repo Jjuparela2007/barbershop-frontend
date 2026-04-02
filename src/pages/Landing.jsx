@@ -131,12 +131,12 @@ Transforma tu imagen con barberos expertos en tendencia, precisión y detalle.
 // ── Sección Servicios ──────────────────────────────────────────
 function Services() {
   const services = [
-    { icon: '/icons/1.jpg', name: 'Corte Clásico', desc: 'Técnica tradicional perfeccionada a lo largo de décadas.', price: '$25.000', time: '50 min' },
-    { icon: '/icons/2.jpg', name: 'Corte + Barba', desc: 'La experiencia completa. Corte impecable y barba definida.', price: '$40.000', time: '50 min' },
-    { icon: '/icons/3.jpg', name: 'Degradado Fade', desc: 'Degradados precisos que definen tu estilo único.', price: '$28.000', time: '40 min' },
-    { icon: '/icons/4.jpg', name: 'Arreglo de Barba', desc: 'Perfilado profesional con productos de alta gama.', price: '$15.000', time: '25 min' },
-    { icon: '/icons/5.jpg', name: 'Afeitado con Navaja', desc: 'Ritual clásico de caballero con vapor y toalla caliente.', price: '$35.000', time: '35 min' },
-    { icon: '/icons/6.jpg', name: 'Corte Infantil', desc: 'Ambiente cómodo y amigable para los más pequeños.', price: '$20.000', time: '30 min' },
+    { icon: '/icons/1.jpg', name: 'Corte Clásico', desc: 'Técnica tradicional perfeccionada a lo largo de décadas.', price: '', time: '' },
+    { icon: '/icons/2.jpg', name: 'Corte + Barba', desc: 'La experiencia completa. Corte impecable y barba definida.', price: '', time: '' },
+    { icon: '/icons/3.jpg', name: 'Degradado Fade', desc: 'Degradados precisos que definen tu estilo único.', price: '', time: '' },
+    { icon: '/icons/4.jpg', name: 'Arreglo de Barba', desc: 'Perfilado profesional con productos de alta gama.', price: '', time: '' },
+    { icon: '/icons/5.jpg', name: 'Afeitado con Navaja', desc: 'Ritual clásico de caballero con vapor y toalla caliente.', price: '', time: '' },
+    { icon: '/icons/6.jpg', name: 'Corte Infantil', desc: 'Ambiente cómodo y amigable para los más pequeños.', price: '', time: '' },
   ];
 
   return (
@@ -221,7 +221,7 @@ function Services() {
                     fontSize: '1.3rem', color: 'var(--gold)', fontWeight: '600',
                   }}>{s.price}</span>
                   <span style={{ fontSize: '0.72rem', color: 'var(--white-muted)', letterSpacing: '0.1em' }}>
-                    ⏱ {s.time}
+                     {s.time}
                   </span>
                 </div>
               </div>
