@@ -59,13 +59,13 @@ export default function Navbar() {
           padding: '6px'
         }}>
             <img 
-              src="/icons/peluqueria.png" 
+              src="/icons/peinado.png" 
               alt="logo"
               style={{
                 width: '100%',
                 height: '100%',
                 objectFit: 'contain',
-                filter: 'invert(1) sepia(1) saturate(5) hue-rotate(10deg)'
+                
               }}
             />
           </div>
