@@ -7,123 +7,161 @@ import { useAuth } from '../context/AuthContext'
 // ── Sección Hero ───────────────────────────────────────────────
 function Hero() {
   const { user } = useAuth()
+
   return (
     <section id="inicio" style={{
       minHeight: '100vh',
-      display: 'flex', alignItems: 'center',
-      position: 'relative', overflow: 'hidden',
+      display: 'flex',
+      alignItems: 'center',
+      position: 'relative',
+      overflow: 'hidden',
       padding: '0 5%',
     }}>
+
       {/* Video de fondo */}
       <video
         src="/barber.mp4"
-        autoPlay muted loop playsInline
+        autoPlay
+        muted
+        loop
+        playsInline
         style={{
-          position: 'absolute', inset: 0,
-          width: '100%', height: '100%',
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
           objectFit: 'cover',
           zIndex: 0,
         }}
       />
 
-      {/* Overlay oscuro encima del video */}
+      {/* Overlay PRO (más elegante) */}
       <div style={{
-        position: 'absolute', inset: 0,
-        background: 'linear-gradient(135deg, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.75) 50%, rgba(10,10,10,0.85) 100%)',
+        position: 'absolute',
+        inset: 0,
+        background: 'linear-gradient(to right, rgba(0,0,0,0.9) 25%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0.2))',
         zIndex: 1,
-      }}/>
-
-      {/* Línea decorativa vertical */}
-      <div style={{
-        position: 'absolute', left: '5%', top: '15%', bottom: '15%',
-        width: '1px',
-        background: 'linear-gradient(to bottom, transparent, var(--gold), transparent)',
-        opacity: 0.4, zIndex: 2,
-      }}/>
+      }} />
 
       {/* Contenido */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%', paddingTop: '80px', position: 'relative', zIndex: 2 }}>
-        <div style={{ maxWidth: '680px' }}>
-          <div className="animate-fade-up delay-100">
-            
-          </div>
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
+        width: '100%',
+        position: 'relative',
+        zIndex: 2,
+        paddingTop: '80px',
+      }}>
 
-          <h1 className="animate-fade-up delay-200" style={{
+        <div style={{
+          maxWidth: '600px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '24px',
+        }}>
+
+          {/* Título */}
+          <h1 style={{
             fontFamily: 'Playfair Display, serif',
-            fontSize: 'clamp(3rem, 7vw, 5.5rem)',
-            fontWeight: '700', lineHeight: '1.05',
+            fontSize: 'clamp(2.8rem, 6vw, 4.8rem)',
+            lineHeight: '1.1',
             color: 'var(--white)',
-            margin: '24px 0 8px',
+            margin: 0,
           }}>
-            Lujo, 
-            <br/>
-            <span className="gold-shimmer">precisión</span>
-            <br/>
-             y estilo
+            Lujo,<br />
+            <span style={{ color: 'var(--gold)' }}>precisión</span><br />
+            y estilo
           </h1>
 
-          <div className="animate-fade-up delay-300" style={{
-            width: '80px', height: '2px', margin: '32px 0',
-            background: 'linear-gradient(90deg, var(--gold), transparent)',
-          }}/>
+          {/* Línea */}
+          <div style={{
+            width: '60px',
+            height: '2px',
+            background: 'var(--gold)',
+          }} />
 
-          <p className="animate-fade-up delay-400" style={{
-            color: 'var(--white-muted)', fontSize: '1.05rem',
-            lineHeight: '1.8', maxWidth: '480px', marginBottom: '48px',
+          {/* Texto corto (OPTIMIZADO) */}
+          <p style={{
+            color: 'var(--white-muted)',
+            fontSize: '1rem',
+            lineHeight: '1.7',
+            maxWidth: '420px',
+            margin: 0,
           }}>
-            Barbería en Usaquén, Bogotá — cortes modernos y estilo masculino premium.
-Transforma tu imagen con barberos expertos en tendencia, precisión y detalle.
+            Barbería premium en Bogotá.  
+            Cortes modernos con precisión y estilo.
           </p>
 
-          <div className="animate-fade-up delay-500" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+          {/* Botones */}
+          <div style={{
+            display: 'flex',
+            gap: '16px',
+            marginTop: '8px',
+            flexWrap: 'wrap',
+          }}>
             <Link to={user ? (user.role === 'admin' ? '/admin' : user.role === 'barber' ? '/barber' : '/client') : '/register'}>
-              <button className="btn-gold">
+              <button className="btn-gold" style={{ padding: '14px 28px' }}>
                 {user ? 'Ir a mi panel' : 'Reservar Cita'}
               </button>
             </Link>
+
             <a href="#servicios">
-              <button className="btn-outline">Ver Servicios</button>
+              <button className="btn-outline" style={{ padding: '14px 28px' }}>
+                Ver Servicios
+              </button>
             </a>
           </div>
 
-          {/* Stats */}
-          <div className="animate-fade-up delay-500" style={{
-            display: 'flex', gap: '48px', marginTop: '64px',
-            paddingTop: '40px', borderTop: '1px solid var(--border)',
+          {/* Stats más limpias */}
+          <div style={{
+            display: 'flex',
+            gap: '40px',
+            marginTop: '40px',
             flexWrap: 'wrap',
           }}>
             {[
-              { num: '12+',  label: 'Años de experiencia' },
-              { num: '8+', label: 'Barberos Profesionales' },
-              { num: '6',   label: 'Servicios premium' },
+              { num: '12+', label: 'Años experiencia' },
+              { num: '8+', label: 'Barberos' },
+              { num: '6', label: 'Servicios' },
             ].map(stat => (
               <div key={stat.label}>
                 <div style={{
                   fontFamily: 'Playfair Display, serif',
-                  fontSize: '2rem', fontWeight: '700', color: 'var(--gold)',
-                }}>{stat.num}</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--white-muted)', letterSpacing: '0.05em' }}>
+                  fontSize: '1.8rem',
+                  color: 'var(--gold)',
+                }}>
+                  {stat.num}
+                </div>
+                <div style={{
+                  fontSize: '0.7rem',
+                  color: 'var(--white-muted)',
+                  letterSpacing: '0.08em',
+                }}>
                   {stat.label}
                 </div>
               </div>
             ))}
           </div>
+
         </div>
       </div>
 
-      {/* Scroll indicator */}
+      {/* Scroll indicator más limpio */}
       <div style={{
-        position: 'absolute', bottom: '40px', left: '50%',
-        transform: 'translateX(-50%)', zIndex: 2,
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
+        position: 'absolute',
+        bottom: '30px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 2,
+        opacity: 0.7,
       }}>
-        <span style={{ fontSize: '0.6rem', letterSpacing: '0.3em', color: 'var(--white-muted)', textTransform: 'uppercase' }}>Scroll</span>
         <div style={{
-          width: '1px', height: '40px',
-          background: 'linear-gradient(to bottom, var(--gold), transparent)',
-          animation: 'fadeIn 2s ease infinite alternate',
-        }}/>
+          width: '1px',
+          height: '30px',
+          background: 'var(--gold)',
+        }} />
       </div>
+
     </section>
   )
 }
