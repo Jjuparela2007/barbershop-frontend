@@ -7,6 +7,21 @@ import { useAuth } from '../context/AuthContext'
 // ── Sección Hero ───────────────────────────────────────────────
 function Hero() {
   const { user } = useAuth()
+  const [stats, setStats] = useState({ barbers: 0, services: 0 })
+
+  const BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'
+
+  useEffect(() => {
+    Promise.all([
+      fetch(`${BASE}/api/barbers`).then(r => r.json()),
+      fetch(`${BASE}/api/services`).then(r => r.json()),
+    ]).then(([barbersData, servicesData]) => {
+      setStats({
+        barbers: barbersData.data.barbers.length,
+        services: servicesData.data.services.length,
+      })
+    }).catch(console.error)
+  }, [])
 
   return (
     <section id="inicio" style={{
@@ -35,7 +50,7 @@ function Hero() {
         }}
       />
 
-      {/* Overlay PRO (más elegante) */}
+      {/* Overlay */}
       <div style={{
         position: 'absolute',
         inset: 0,
@@ -52,7 +67,6 @@ function Hero() {
         zIndex: 2,
         paddingTop: '80px',
       }}>
-
         <div style={{
           maxWidth: '600px',
           display: 'flex',
@@ -60,7 +74,6 @@ function Hero() {
           gap: '24px',
         }}>
 
-          {/* Título */}
           <h1 style={{
             fontFamily: 'Playfair Display, serif',
             fontSize: 'clamp(2.8rem, 6vw, 4.8rem)',
@@ -73,14 +86,8 @@ function Hero() {
             y estilo
           </h1>
 
-          {/* Línea */}
-          <div style={{
-            width: '60px',
-            height: '2px',
-            background: 'var(--gold)',
-          }} />
+          <div style={{ width: '60px', height: '2px', background: 'var(--gold)' }} />
 
-          {/* Texto corto (OPTIMIZADO) */}
           <p style={{
             color: 'var(--white-muted)',
             fontSize: '1rem',
@@ -92,19 +99,12 @@ function Hero() {
             Cortes modernos con precisión y estilo.
           </p>
 
-          {/* Botones */}
-          <div style={{
-            display: 'flex',
-            gap: '16px',
-            marginTop: '8px',
-            flexWrap: 'wrap',
-          }}>
+          <div style={{ display: 'flex', gap: '16px', marginTop: '8px', flexWrap: 'wrap' }}>
             <Link to={user ? (user.role === 'admin' ? '/admin' : user.role === 'barber' ? '/barber' : '/client') : '/register'}>
               <button className="btn-gold" style={{ padding: '14px 28px' }}>
                 {user ? 'Ir a mi panel' : 'Reservar Cita'}
               </button>
             </Link>
-
             <a href="#servicios">
               <button className="btn-outline" style={{ padding: '14px 28px' }}>
                 Ver Servicios
@@ -112,17 +112,11 @@ function Hero() {
             </a>
           </div>
 
-          {/* Stats más limpias */}
-          <div style={{
-            display: 'flex',
-            gap: '40px',
-            marginTop: '40px',
-            flexWrap: 'wrap',
-          }}>
+          <div style={{ display: 'flex', gap: '40px', marginTop: '40px', flexWrap: 'wrap' }}>
             {[
               { num: '12+', label: 'Años experiencia' },
-              { num: '8+', label: 'Barberos' },
-              { num: '6', label: 'Servicios' },
+              { num: `${stats.barbers}+`, label: 'Barberos' },
+              { num: stats.services, label: 'Servicios' },
             ].map(stat => (
               <div key={stat.label}>
                 <div style={{
@@ -146,7 +140,7 @@ function Hero() {
         </div>
       </div>
 
-      {/* Scroll indicator más limpio */}
+      {/* Scroll indicator */}
       <div style={{
         position: 'absolute',
         bottom: '30px',
@@ -155,11 +149,7 @@ function Hero() {
         zIndex: 2,
         opacity: 0.7,
       }}>
-        <div style={{
-          width: '1px',
-          height: '30px',
-          background: 'var(--gold)',
-        }} />
+        <div style={{ width: '1px', height: '30px', background: 'var(--gold)' }} />
       </div>
 
     </section>
