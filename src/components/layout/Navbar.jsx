@@ -45,7 +45,7 @@ export default function Navbar() {
       <div style={{
         maxWidth: '1200px', margin: '0 auto',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        height: '120px',
+        height: '80px',
       }}>
         {/* Logo */}
         <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px' }}>

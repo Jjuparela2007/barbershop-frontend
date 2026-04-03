@@ -84,7 +84,7 @@ export default function BarberProfile() {
     lineHeight: 1,
     userSelect: 'none',
     zIndex: 2,
-  }}>✂</div>
+  }}></div>
 
   {/* Contenido */}
   <div style={{
