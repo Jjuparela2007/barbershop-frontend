@@ -13,6 +13,7 @@ export default function BookAppointment() {
     barber_id: '', service_id: '', appointment_date: '', start_time: '', notes: '',
   })
   const navigate = useNavigate()
+  const BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'
 
   useEffect(() => {
   api.get('/barbers').then(r => {
@@ -119,13 +120,29 @@ export default function BookAppointment() {
                     border: `1px solid ${form.barber_id == b.id ? 'var(--gold)' : 'var(--border)'}`,
                     padding: '32px', cursor: 'pointer',
                   }}>
-                  <div style={{
+
+              {/* Avatar con imagen o inicial */}
+              {b.avatar_url ? (
+                <img
+                  src={`${BASE}${b.avatar_url}`}
+                  alt={b.name}
+                  style={{
                     width: '56px', height: '56px',
-                    background: 'linear-gradient(135deg, var(--gold-dark), var(--gold))',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: 'Playfair Display, serif', fontSize: '1.5rem',
-                    color: 'var(--black)', marginBottom: '16px',
-                  }}>{b.name.charAt(0)}</div>
+                    objectFit: 'cover',
+                    border: '2px solid var(--gold)',
+                    marginBottom: '16px',
+                  }}
+                />
+              ) : (
+                <div style={{
+                  width: '56px', height: '56px',
+                  background: 'linear-gradient(135deg, var(--gold-dark), var(--gold))',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontFamily: 'Playfair Display, serif', fontSize: '1.5rem',
+                  color: 'var(--black)', marginBottom: '16px',
+                }}>{b.name.charAt(0)}</div>
+              )}
+
                   <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.1rem', color: 'var(--white)', marginBottom: '4px' }}>{b.name}</h3>
                   <p style={{ fontSize: '0.75rem', color: 'var(--gold)', letterSpacing: '0.1em', marginBottom: '8px' }}>
                     {b.specialties || 'Barbero profesional'}
