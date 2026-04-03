@@ -101,7 +101,7 @@ export default function BarberProfile() {
     {/* Imagen completa */}
     {barber.avatar_url && (
       <img
-        src={`${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${barber.avatar_url}`}
+        src={barber.avatar_url}
         alt={barber.name}
         style={{
           width: '100%',

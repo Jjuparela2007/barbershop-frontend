@@ -729,7 +729,7 @@ function SectionUsers() {
 
                 {/* Avatar o inicial */}
                 {u.avatar_url ? (
-                  <img src={`${BASE}${u.avatar_url}`} alt={u.name} style={{
+                  <img src={u.avatar_url} style={{
                     width: '40px', height: '40px', objectFit: 'cover',
                     border: `1px solid ${ROLE_COLOR[u.role]}`,
                   }} />

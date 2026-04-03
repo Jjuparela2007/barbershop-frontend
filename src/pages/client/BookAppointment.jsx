@@ -124,7 +124,7 @@ export default function BookAppointment() {
               {/* Avatar con imagen o inicial */}
               {b.avatar_url ? (
                 <img
-                  src={`${BASE}${b.avatar_url}`}
+                  src={b.avatar_url}
                   alt={b.name}
                   style={{
                     width: '56px', height: '56px',

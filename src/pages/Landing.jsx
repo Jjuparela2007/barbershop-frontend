@@ -245,7 +245,7 @@ function Services() {
                 justifyContent: 'center',
               }}>
                 <img
-                  src={s.image_url ? `${BASE}${s.image_url}` : `/icons/${i + 1}.jpg`}
+                  src={s.image_url ? s.image_url : `/icons/${i + 1}.jpg`}
                   alt={s.name}
                   style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }}
                 />
@@ -365,7 +365,7 @@ function Barbers() {
               
               {b.avatar_url ? (
                 <img
-                  src={`${BASE}${b.avatar_url}`}
+                  src={b.avatar_url}
                   alt={b.name}
                   style={{
                     width: '80px', height: '80px',
