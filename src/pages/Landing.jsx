@@ -130,14 +130,38 @@ Transforma tu imagen con barberos expertos en tendencia, precisión y detalle.
 
 // ── Sección Servicios ──────────────────────────────────────────
 function Services() {
-  const services = [
-    { icon: '/icons/1.jpg', name: 'Corte Clásico', desc: 'Técnica tradicional perfeccionada a lo largo de décadas.', price: '', time: '' },
-    { icon: '/icons/2.jpg', name: 'Corte + Barba', desc: 'La experiencia completa. Corte impecable y barba definida.', price: '', time: '' },
-    { icon: '/icons/3.jpg', name: 'Degradado Fade', desc: 'Degradados precisos que definen tu estilo único.', price: '', time: '' },
-    { icon: '/icons/4.jpg', name: 'Arreglo de Barba', desc: 'Perfilado profesional con productos de alta gama.', price: '', time: '' },
-    { icon: '/icons/5.jpg', name: 'Afeitado con Navaja', desc: 'Ritual clásico de caballero con vapor y toalla caliente.', price: '', time: '' },
-    { icon: '/icons/6.jpg', name: 'Corte Infantil', desc: 'Ambiente cómodo y amigable para los más pequeños.', price: '', time: '' },
-  ];
+  const [services, setServices] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  const BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'
+  useEffect(() => {
+    
+    fetch(`${BASE}/api/services`)
+      .then(r => r.json())
+      .then(data => {
+        // Ajusta según la estructura real que devuelve tu API
+        setServices(data.data.services)
+        setLoading(false)
+      })
+      .catch(err => {
+        console.error(err)
+        setError('No se pudieron cargar los servicios.')
+        setLoading(false)
+      })
+  }, [])
+
+  if (loading) return (
+    <section id="servicios" style={{ padding: '120px 5%', background: 'var(--black-soft)', textAlign: 'center' }}>
+      <p style={{ color: 'var(--gold)' }}>Cargando servicios...</p>
+    </section>
+  )
+
+  if (error) return (
+    <section id="servicios" style={{ padding: '120px 5%', background: 'var(--black-soft)', textAlign: 'center' }}>
+      <p style={{ color: 'var(--white-muted)' }}>{error}</p>
+    </section>
+  )
 
   return (
     <section id="servicios" style={{
@@ -174,32 +198,32 @@ function Services() {
           gap: '20px',
         }}>
           {services.map((s, i) => (
-            <div key={i} className="card-hover" style={{
+            <div key={s.id ?? i} className="card-hover" style={{
               background: 'var(--black-card)',
               border: '1px solid var(--border)',
               padding: '20px',
               cursor: 'pointer',
-              display: 'flex',      // Flex para dividir en dos columnas
+              display: 'flex',
               flexDirection: 'row',
               alignItems: 'center',
               gap: '20px',
             }}>
-              
-              {/* Imagen ocupa la mitad */}
+
+              {/* Imagen */}
               <div style={{
-                flex: '1',             // Ocupa la mitad del espacio
+                flex: '1',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-                <img 
-                  src={s.icon} 
-                  alt={s.name} 
+                <img
+                  src={s.image_url ? `${BASE}${s.image_url}` : `/icons/${i + 1}.jpg`}
+                  alt={s.name}
                   style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }}
                 />
               </div>
 
-              {/* Texto ocupa la otra mitad */}
+              {/* Texto */}
               <div style={{ flex: '1' }}>
                 <h3 style={{
                   fontFamily: 'Playfair Display, serif',
@@ -210,18 +234,27 @@ function Services() {
                 <p style={{
                   color: 'var(--white-muted)', fontSize: '0.88rem',
                   lineHeight: '1.7', marginBottom: '28px',
-                }}>{s.desc}</p>
+                }}>{s.description}</p>
 
                 <div style={{
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                   paddingTop: '20px', borderTop: '1px solid var(--border)',
                 }}>
-                  <span style={{
-                    fontFamily: 'Playfair Display, serif',
-                    fontSize: '1.3rem', color: 'var(--gold)', fontWeight: '600',
-                  }}>{s.price}</span>
+                 <span style={{
+  fontFamily: 'Playfair Display, serif',
+  fontSize: '1.3rem',
+  color: 'var(--gold)',
+  fontWeight: '600',
+}}>
+  {s.price
+    ? Number(s.price).toLocaleString('es-CO', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      })
+    : ''}
+</span>
                   <span style={{ fontSize: '0.72rem', color: 'var(--white-muted)', letterSpacing: '0.1em' }}>
-                     {s.time}
+                    {s.duration_minutes ? `${s.duration_minutes} min` : s.time || ''}
                   </span>
                 </div>
               </div>
@@ -231,20 +264,42 @@ function Services() {
         </div>
       </div>
     </section>
-  );
+  )
 }
 
 // ── Sección Barberos ───────────────────────────────────────────
 function Barbers() {
   const [barbers, setBarbers] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  const BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'
 
   useEffect(() => {
-  const BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'
-  fetch(`${BASE}/api/barbers`)
-    .then(r => r.json())
-    .then(data => setBarbers(data.data.barbers))
-    .catch(err => console.error(err))
-}, [])
+    fetch(`${BASE}/api/barbers`)
+      .then(r => r.json())
+      .then(data => {
+        setBarbers(data.data.barbers)
+        setLoading(false)
+      })
+      .catch(err => {
+        console.error(err)
+        setError('No se pudo cargar el equipo.')
+        setLoading(false)
+      })
+  }, [])
+
+  if (loading) return (
+    <section id="barberos" style={{ padding: '120px 5%', background: 'var(--black)', textAlign: 'center' }}>
+      <p style={{ color: 'var(--gold)' }}>Cargando equipo...</p>
+    </section>
+  )
+
+  if (error) return (
+    <section id="barberos" style={{ padding: '120px 5%', background: 'var(--black)', textAlign: 'center' }}>
+      <p style={{ color: 'var(--white-muted)' }}>{error}</p>
+    </section>
+  )
 
   return (
     <section id="barberos" style={{ padding: '120px 5%', background: 'var(--black)' }}>
@@ -279,15 +334,29 @@ function Barbers() {
               }}>0{i + 1}</div>
 
               {/* Avatar */}
-              <div style={{
-                width: '80px', height: '80px',
-                background: 'linear-gradient(135deg, var(--gold-dark), var(--gold))',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                marginBottom: '28px',
-                fontFamily: 'Playfair Display, serif',
-                fontSize: '2rem', fontWeight: '700',
-                color: 'var(--black)',
-              }}>{b.name.charAt(0)}</div>
+              
+              {b.avatar_url ? (
+                <img
+                  src={`${BASE}${b.avatar_url}`}
+                  alt={b.name}
+                  style={{
+                    width: '80px', height: '80px',
+                    objectFit: 'cover',
+                    marginBottom: '28px',
+                    border: '2px solid var(--gold)',
+                  }}
+                />
+                ) : (
+                  <div style={{
+                    width: '80px', height: '80px',
+                    background: 'linear-gradient(135deg, var(--gold-dark), var(--gold))',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    marginBottom: '28px',
+                    fontFamily: 'Playfair Display, serif',
+                    fontSize: '2rem', fontWeight: '700',
+                    color: 'var(--black)',
+                  }}>{b.name.charAt(0)}</div>
+                )}
 
               <h3 style={{
                 fontFamily: 'Playfair Display, serif',
@@ -313,17 +382,15 @@ function Barbers() {
               )}
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-  <Link to={`/barber/${b.id}`}>
-    <button className="btn-outline" style={{ width: '100%' }}>
-      Ver perfil
-    </button>
-  </Link>
-  <Link to="/register" onClick={() => localStorage.setItem('preselected_barber', b.id)}>
-  <button className="btn-gold" style={{ width: '100%' }}>
-    Reservar con {b.name.split(' ')[0]}
-  </button>
-</Link>
-</div>
+                <Link to={`/barber/${b.id}`}>
+                  <button className="btn-outline" style={{ width: '100%' }}>Ver perfil</button>
+                </Link>
+                <Link to="/register" onClick={() => localStorage.setItem('preselected_barber', b.id)}>
+                  <button className="btn-gold" style={{ width: '100%' }}>
+                    Reservar con {b.name.split(' ')[0]}
+                  </button>
+                </Link>
+              </div>
             </div>
           ))}
         </div>

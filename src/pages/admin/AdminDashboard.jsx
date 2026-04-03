@@ -540,7 +540,6 @@ function SectionAppointments() {
   )
 }
 
-// ── Usuarios ───────────────────────────────────────────────────
 function SectionUsers() {
   const [users, setUsers]       = useState([])
   const [loading, setLoading]   = useState(true)
@@ -552,6 +551,10 @@ function SectionUsers() {
   const [msg, setMsg]           = useState('')
   const [actionLoading, setActionLoading] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
+  const [imageFile, setImageFile]       = useState(null)
+  const [imagePreview, setImagePreview] = useState(null)
+
+  const BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'
 
   useEffect(() => { fetchUsers() }, [])
 
@@ -576,9 +579,7 @@ function SectionUsers() {
       confirmMessage = '¿Reactivar este usuario? Volverá a tener acceso al sistema.'
       actionMessage = 'reactivar'
       newStatus = true
-    } else {
-      return
-    }
+    } else return
 
     if (!confirm(confirmMessage)) return
 
@@ -590,13 +591,9 @@ function SectionUsers() {
       fetchUsers()
     } catch (error) {
       console.error(error)
-      if (error.response?.status === 400) {
-        alert(error.response?.data?.message || `No se pudo ${actionMessage} el usuario`)
-        setMsg(`✗ ${error.response?.data?.message || `No se pudo ${actionMessage} el usuario`}`)
-      } else {
-        alert(`No se pudo ${actionMessage} el usuario`)
-        setMsg(`✗ No se pudo ${actionMessage} el usuario`)
-      }
+      const msg = error.response?.data?.message || `No se pudo ${actionMessage} el usuario`
+      alert(msg)
+      setMsg(`✗ ${msg}`)
       setTimeout(() => setMsg(''), 3000)
     } finally {
       setActionLoading(false)
@@ -607,6 +604,8 @@ function SectionUsers() {
     setEditing(user)
     setEditForm({ name: user.name, email: user.email, phone: user.phone || '', new_password: '', specialties: '', experience_years: 0, bio: '' })
     setShowNewPassword(false)
+    setImageFile(null)
+    setImagePreview(user.avatar_url ? `${BASE}${user.avatar_url}` : null)
     setMsg('')
     if (user.role === 'barber') {
       api.get(`/barbers/${user.id}`).then(r => {
@@ -623,6 +622,14 @@ function SectionUsers() {
       if (editForm.new_password) await api.put(`/users/${editing.id}/password`, { new_password: editForm.new_password })
       if (editing.role === 'barber') {
         await api.put(`/users/${editing.id}/barber-profile`, { specialties: editForm.specialties, experience_years: Number(editForm.experience_years), bio: editForm.bio })
+        // Subir avatar si se seleccionó uno
+        if (imageFile) {
+          const formData = new FormData()
+          formData.append('image', imageFile)
+          await api.post(`/barbers/${editing.id}/avatar`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          })
+        }
       }
       setMsg('✓ Guardado correctamente')
       setTimeout(() => setMsg(''), 3000)
@@ -634,11 +641,11 @@ function SectionUsers() {
   }
 
   const ROLE_COLOR = { admin: '#8B5CF6', barber: '#C9A84C', client: '#10B981' }
-  const clients    = users.filter(u => u.role === 'client')
-  const barbers    = users.filter(u => u.role === 'barber')
+  const clients = users.filter(u => u.role === 'client')
+  const barbers = users.filter(u => u.role === 'barber')
   const filtered = (tab === 'client' ? clients : barbers)
     .filter(u =>
-      u.name.toLowerCase().includes(search.toLowerCase())  ||
+      u.name.toLowerCase().includes(search.toLowerCase()) ||
       u.email.toLowerCase().includes(search.toLowerCase()) ||
       (u.phone && u.phone.includes(search))
     )
@@ -719,12 +726,22 @@ function SectionUsers() {
             onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)'}
             onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}>
               <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                <div style={{
-                  width: '40px', height: '40px',
-                  background: `linear-gradient(135deg, ${ROLE_COLOR[u.role]}88, ${ROLE_COLOR[u.role]})`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontFamily: 'Playfair Display, serif', fontSize: '1rem', color: 'var(--black)',
-                }}>{u.name.charAt(0)}</div>
+
+                {/* Avatar o inicial */}
+                {u.avatar_url ? (
+                  <img src={`${BASE}${u.avatar_url}`} alt={u.name} style={{
+                    width: '40px', height: '40px', objectFit: 'cover',
+                    border: `1px solid ${ROLE_COLOR[u.role]}`,
+                  }} />
+                ) : (
+                  <div style={{
+                    width: '40px', height: '40px',
+                    background: `linear-gradient(135deg, ${ROLE_COLOR[u.role]}88, ${ROLE_COLOR[u.role]})`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontFamily: 'Playfair Display, serif', fontSize: '1rem', color: 'var(--black)',
+                  }}>{u.name.charAt(0)}</div>
+                )}
+
                 <div>
                   <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '0.95rem', color: 'var(--white)', marginBottom: '2px' }}>{u.name}</div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--white-muted)' }}>{u.email} {u.phone && `· ${u.phone}`}</div>
@@ -738,9 +755,7 @@ function SectionUsers() {
                   fontSize: '0.65rem', color: u.is_active ? '#6ee7b7' : '#fc8181',
                   letterSpacing: '0.1em', textTransform: 'uppercase',
                 }}>{u.is_active ? 'Activo' : 'Inactivo'}</div>
-                <button onClick={() => openEdit(u)} className="btn-gold" style={{ padding: '6px 14px', fontSize: '0.7rem' }} disabled={actionLoading}>
-                  Editar
-                </button>
+                <button onClick={() => openEdit(u)} className="btn-gold" style={{ padding: '6px 14px', fontSize: '0.7rem' }} disabled={actionLoading}>Editar</button>
                 {u.role !== 'admin' && (
                   <button
                     onClick={() => toggleStatus(u.id, u.is_active, u.is_active ? 'deactivate' : 'reactivate')}
@@ -809,6 +824,30 @@ function SectionUsers() {
                         style={inputStyle} onFocus={e => e.target.style.borderColor = 'var(--gold)'} onBlur={e => e.target.style.borderColor = 'var(--border)'} />
                     </div>
                   ))}
+
+                  {/* Avatar del barbero */}
+                  <div style={{ height: '1px', background: 'var(--border)', margin: '4px 0' }}/>
+                  <p style={{ fontSize: '0.7rem', color: 'var(--gold)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Foto de perfil</p>
+                  <div>
+                    {imagePreview && (
+                      <img src={imagePreview} alt="preview" style={{
+                        width: '80px', height: '80px', objectFit: 'cover',
+                        marginBottom: '10px', border: '2px solid var(--gold)',
+                      }} />
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={e => {
+                        const file = e.target.files[0]
+                        if (file) {
+                          setImageFile(file)
+                          setImagePreview(URL.createObjectURL(file))
+                        }
+                      }}
+                      style={{ ...inputStyle, padding: '8px', cursor: 'pointer' }}
+                    />
+                  </div>
                 </>
               )}
 
@@ -829,16 +868,11 @@ function SectionUsers() {
                     onFocus={e => e.target.style.borderColor = 'var(--gold)'}
                     onBlur={e  => e.target.style.borderColor = 'var(--border)'}
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword(prev => !prev)}
-                    style={{
-                      position: 'absolute', right: '12px', top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'none', border: 'none', cursor: 'pointer',
-                      padding: '4px', color: 'var(--white-muted)', display: 'flex',
-                      alignItems: 'center', justifyContent: 'center', transition: 'color 0.2s',
-                    }}
+                  <button type="button" onClick={() => setShowNewPassword(prev => !prev)} style={{
+                    position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)',
+                    background: 'none', border: 'none', cursor: 'pointer', padding: '4px',
+                    color: 'var(--white-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.2s',
+                  }}
                     onMouseEnter={e => e.currentTarget.style.color = 'var(--gold)'}
                     onMouseLeave={e => e.currentTarget.style.color = 'var(--white-muted)'}
                   >
@@ -1632,12 +1666,16 @@ function SectionShop() {
 
 // ── Servicios ──────────────────────────────────────────────────
 function SectionServices() {
-  const [services, setServices] = useState([])
-  const [loading,  setLoading]  = useState(true)
-  const [editing,  setEditing]  = useState(null)
-  const [form,     setForm]     = useState({ name: '', description: '', duration_minutes: '', price: '', display_order: '' })
-  const [saving,   setSaving]   = useState(false)
-  const [msg,      setMsg]      = useState('')
+  const [services,      setServices]      = useState([])
+  const [loading,       setLoading]       = useState(true)
+  const [editing,       setEditing]       = useState(null)
+  const [form,          setForm]          = useState({ name: '', description: '', duration_minutes: '', price: '', display_order: '' })
+  const [saving,        setSaving]        = useState(false)
+  const [msg,           setMsg]           = useState('')
+  const [imageFile,     setImageFile]     = useState(null)
+  const [imagePreview,  setImagePreview]  = useState(null)
+
+  const BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'
 
   const inputStyle = {
     width: '100%', padding: '10px 14px',
@@ -1660,16 +1698,24 @@ function SectionServices() {
   const openCreate = () => {
     setForm({ name: '', description: '', duration_minutes: '', price: '', display_order: '' })
     setMsg('')
+    setImageFile(null)
+    setImagePreview(null)
     setEditing('create')
   }
 
   const openEdit = (svc) => {
     setForm({ name: svc.name, description: svc.description || '', duration_minutes: svc.duration_minutes, price: svc.price, display_order: svc.display_order || 0 })
     setMsg('')
+    setImageFile(null)
+    setImagePreview(svc.image_url ? `${BASE}${svc.image_url}` : null)
     setEditing(svc)
   }
 
-  const closeModal = () => setEditing(null)
+  const closeModal = () => {
+    setEditing(null)
+    setImageFile(null)
+    setImagePreview(null)
+  }
 
   const handleSave = async () => {
     if (!form.name || !form.price || !form.duration_minutes) {
@@ -1679,13 +1725,26 @@ function SectionServices() {
     setSaving(true); setMsg('')
     try {
       const payload = { ...form, price: parseFloat(form.price), duration_minutes: parseInt(form.duration_minutes), display_order: parseInt(form.display_order) || 0 }
+
+      let savedId
       if (editing === 'create') {
-        await api.post('/admin/services', payload)
-        setMsg('✓ Servicio creado correctamente')
+        const { data } = await api.post('/admin/services', payload)
+        savedId = data.data.service.id
       } else {
         await api.put(`/admin/services/${editing.id}`, payload)
-        setMsg('✓ Servicio actualizado correctamente')
+        savedId = editing.id
       }
+
+      // Subir imagen si se seleccionó una
+      if (imageFile && savedId) {
+        const formData = new FormData()
+        formData.append('image', imageFile)
+        await api.post(`/services/${savedId}/image`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        })
+      }
+
+      setMsg('✓ Servicio guardado correctamente')
       await fetchServices()
       setTimeout(closeModal, 800)
     } catch (err) {
@@ -1729,18 +1788,29 @@ function SectionServices() {
             onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)'}
             onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}>
               <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                <div style={{
-                  width: '44px', height: '44px', flexShrink: 0,
-                  background: 'linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05))',
-                  border: '1px solid rgba(201,168,76,0.2)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem',
-                }}>✂</div>
+
+                {/* Miniatura o ícono */}
+                {svc.image_url ? (
+                  <img src={`${BASE}${svc.image_url}`} alt={svc.name} style={{
+                    width: '44px', height: '44px', objectFit: 'cover',
+                    border: '1px solid rgba(201,168,76,0.2)', flexShrink: 0,
+                  }} />
+                ) : (
+                  <div style={{
+                    width: '44px', height: '44px', flexShrink: 0,
+                    background: 'linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05))',
+                    border: '1px solid rgba(201,168,76,0.2)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem',
+                  }}>✂</div>
+                )}
+
                 <div>
                   <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '0.95rem', color: 'var(--white)', marginBottom: '3px' }}>{svc.name}</div>
                   {svc.description && <div style={{ fontSize: '0.72rem', color: 'var(--white-muted)', marginBottom: '3px', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{svc.description}</div>}
                   <span style={{ fontSize: '0.68rem', color: 'var(--white-muted)' }}>⏱ {svc.duration_minutes} min</span>
                 </div>
               </div>
+
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                 <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.2rem', color: 'var(--gold)' }}>
                   ${Number(svc.price).toLocaleString('es-CO')}
@@ -1783,6 +1853,32 @@ function SectionServices() {
                     style={inputStyle} onFocus={e => e.target.style.borderColor = 'var(--gold)'} onBlur={e => e.target.style.borderColor = 'var(--border)'} />
                 </div>
               ))}
+
+              {/* Input de imagen */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--white-muted)', marginBottom: '6px' }}>
+                  Imagen del servicio
+                </label>
+                {imagePreview && (
+                  <img src={imagePreview} alt="preview" style={{
+                    width: '100%', height: '160px', objectFit: 'cover',
+                    marginBottom: '10px', borderRadius: '4px',
+                    border: '1px solid var(--border)',
+                  }} />
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={e => {
+                    const file = e.target.files[0]
+                    if (file) {
+                      setImageFile(file)
+                      setImagePreview(URL.createObjectURL(file))
+                    }
+                  }}
+                  style={{ ...inputStyle, padding: '8px', cursor: 'pointer' }}
+                />
+              </div>
 
               {msg && <div style={{ padding: '10px 14px', fontSize: '0.82rem', background: msg.startsWith('✓') ? 'rgba(16,185,129,0.1)' : 'rgba(220,38,38,0.1)', border: `1px solid ${msg.startsWith('✓') ? 'rgba(16,185,129,0.3)' : 'rgba(220,38,38,0.3)'}`, color: msg.startsWith('✓') ? '#6ee7b7' : '#fc8181' }}>{msg}</div>}
 

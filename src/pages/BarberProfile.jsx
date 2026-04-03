@@ -40,69 +40,145 @@ export default function BarberProfile() {
     <div style={{ minHeight: '100vh', background: 'var(--black)', paddingTop: '80px' }}>
 
       {/* Hero del barbero */}
-      <div style={{
-        background: 'var(--black-soft)',
-        borderBottom: '1px solid var(--border)',
-        padding: '64px 5%',
-        position: 'relative', overflow: 'hidden',
+      {/* Hero del barbero */}
+<div style={{
+  background: 'black',
+  borderBottom: '1px solid var(--border)',
+  padding: '64px 5%',
+  position: 'relative',
+  overflow: 'hidden',
+}}>
+
+  {/* Fondo blur */}
+  <div style={{
+    position: 'absolute',
+    inset: 0,
+    backgroundImage: barber.avatar_url 
+      ? `url(${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${barber.avatar_url})`
+      : 'none',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    filter: 'blur(25px)',
+    transform: 'scale(1.1)',
+    zIndex: 0,
+  }} />
+
+  {/* Overlay oscuro */}
+  <div style={{
+    position: 'absolute',
+    inset: 0,
+    background: 'rgba(0,0,0,0.6)',
+    zIndex: 1,
+  }} />
+
+  {/* Número decorativo */}
+  <div style={{
+    position: 'absolute',
+    right: '5%',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    fontFamily: 'Playfair Display, serif',
+    fontSize: '14rem',
+    fontWeight: '700',
+    color: 'rgba(201,168,76,0.04)',
+    lineHeight: 1,
+    userSelect: 'none',
+    zIndex: 2,
+  }}>✂</div>
+
+  {/* Contenido */}
+  <div style={{
+    maxWidth: '1100px',
+    margin: '0 auto',
+    display: 'flex',
+    gap: '48px',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    position: 'relative',
+    zIndex: 2,
+  }}>
+
+    {/* Imagen completa */}
+    {barber.avatar_url && (
+      <img
+        src={`${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${barber.avatar_url}`}
+        alt={barber.name}
+        style={{
+          width: '100%',
+          maxWidth: '260px',
+          objectFit: 'contain',
+          borderRadius: '12px',
+          border: '2px solid var(--gold)',
+          boxShadow: '0 8px 20px rgba(0,0,0,0.5)',
+        }}
+      />
+    )}
+
+    {/* Info */}
+    <div style={{ flex: 1 }}>
+      <span className="section-label">✦ Perfil del barbero</span>
+
+      <h1 style={{
+        fontFamily: 'Playfair Display, serif',
+        fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
+        color: 'var(--white)',
+        margin: '8px 0 4px',
       }}>
-        {/* Número decorativo */}
-        <div style={{
-          position: 'absolute', right: '5%', top: '50%', transform: 'translateY(-50%)',
-          fontFamily: 'Playfair Display, serif', fontSize: '14rem', fontWeight: '700',
-          color: 'rgba(201,168,76,0.04)', lineHeight: 1, userSelect: 'none',
-        }}>✂</div>
+        {barber.name}
+      </h1>
 
-        <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', gap: '48px', alignItems: 'center', flexWrap: 'wrap' }}>
-
-          {/* Avatar */}
-          <div style={{
-            width: '120px', height: '120px', flexShrink: 0,
-            background: 'linear-gradient(135deg, var(--gold-dark), var(--gold))',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: 'Playfair Display, serif', fontSize: '3rem',
-            fontWeight: '700', color: 'var(--black)',
-          }}>
-            {barber.name.charAt(0)}
-          </div>
-
-          {/* Info */}
-          <div style={{ flex: 1 }}>
-            <span className="section-label">✦ Perfil del barbero</span>
-            <h1 style={{
-              fontFamily: 'Playfair Display, serif',
-              fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
-              color: 'var(--white)', margin: '8px 0 4px',
-            }}>{barber.name}</h1>
-
-            <div style={{ fontSize: '0.75rem', color: 'var(--gold)', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '16px' }}>
-              Barbero profesional {barber.experience_years > 0 && `· ${barber.experience_years} años de experiencia`}
-            </div>
-
-            {barber.bio && (
-              <p style={{ color: 'var(--white-muted)', fontSize: '0.95rem', lineHeight: '1.8', maxWidth: '560px', marginBottom: '20px' }}>
-                {barber.bio}
-              </p>
-            )}
-
-            {barber.specialties && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '28px' }}>
-                {barber.specialties.split(',').map(s => (
-                  <span key={s} style={{
-                    padding: '4px 14px', border: '1px solid var(--border)',
-                    fontSize: '0.72rem', color: 'var(--white-muted)', letterSpacing: '0.05em',
-                  }}>{s.trim()}</span>
-                ))}
-              </div>
-              
-            )}
-
-            <Link to={`/register`}>
-              <button className="btn-gold">Reservar con {barber.name.split(' ')[0]}</button>
-            </Link>
-          </div>
-        </div>
+      <div style={{
+        fontSize: '0.75rem',
+        color: 'var(--gold)',
+        letterSpacing: '0.2em',
+        textTransform: 'uppercase',
+        marginBottom: '16px'
+      }}>
+        Barbero profesional {barber.experience_years > 0 && `· ${barber.experience_years} años de experiencia`}
       </div>
+
+      {barber.bio && (
+        <p style={{
+          color: 'var(--white-muted)',
+          fontSize: '0.95rem',
+          lineHeight: '1.8',
+          maxWidth: '560px',
+          marginBottom: '20px'
+        }}>
+          {barber.bio}
+        </p>
+      )}
+
+      {barber.specialties && (
+        <div style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '8px',
+          marginBottom: '28px'
+        }}>
+          {barber.specialties.split(',').map(s => (
+            <span key={s} style={{
+              padding: '4px 14px',
+              border: '1px solid var(--border)',
+              fontSize: '0.72rem',
+              color: 'var(--white-muted)',
+              letterSpacing: '0.05em',
+            }}>
+              {s.trim()}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <Link to={`/register`}>
+        <button className="btn-gold">
+          Reservar con {barber.name.split(' ')[0]}
+        </button>
+      </Link>
+    </div>
+
+  </div>
+</div>
       {barber.gallery && barber.gallery.length > 0 && (
   <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 5% 64px' }}>
     <span className="section-label">✦ Galería</span>
