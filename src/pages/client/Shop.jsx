@@ -6,7 +6,7 @@ import api from '../../services/api'
 const CATEGORY_LABEL = {
   accesorios: { label: 'Accesorios' },
   ropa:       { label: 'Ropa' },
-  barberia:   { label: 'Cuidado Personal' },
+  barberia:   { label: 'Cuidado Personal ' },
 }
 
 /* ─── Product Detail Modal ─────────────────────────────────────────── */
