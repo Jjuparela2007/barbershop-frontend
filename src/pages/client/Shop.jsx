@@ -1,25 +1,218 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import api from '../../services/api'
 
 const CATEGORY_LABEL = {
-  accesorios: { label: 'Accesorios',         },
-  ropa:       { label: 'Ropa',               },
-  barberia:   { label: 'Cuidado Personal', },
+  accesorios: { label: 'Accesorios' },
+  ropa:       { label: 'Ropa' },
+  barberia:   { label: 'Cuidado Personal' },
 }
 
+/* ─── Product Detail Modal ─────────────────────────────────────────── */
+function ProductModal({ product, cart, onClose, onAdd, onUpdateQty }) {
+  const inCart     = cart.find(i => i.id === product.id)
+  const outOfStock = product.stock === 0
+
+  // Close on Escape
+  useEffect(() => {
+    const handler = e => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
+
+  const btnQty = {
+    width: '36px', height: '36px', flexShrink: 0,
+    background: 'var(--black-soft)', border: '1px solid var(--border)',
+    color: 'var(--white)', cursor: 'pointer',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontSize: '1.1rem', lineHeight: 1, transition: 'border-color 0.2s',
+  }
+
+  return (
+    <div
+      style={{
+        position: 'fixed', inset: 0, zIndex: 3000,
+        background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(6px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '20px',
+        animation: 'fadeIn 0.2s ease',
+      }}
+      onClick={e => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <style>{`
+        @keyframes fadeIn   { from { opacity: 0 } to { opacity: 1 } }
+        @keyframes slideUp  { from { opacity: 0; transform: translateY(24px) } to { opacity: 1; transform: translateY(0) } }
+      `}</style>
+
+      <div style={{
+        background: 'var(--black-soft)', border: '1px solid var(--border)',
+        width: '100%', maxWidth: '720px', maxHeight: '90vh',
+        overflowY: 'auto', position: 'relative',
+        animation: 'slideUp 0.25s ease',
+      }}>
+
+        {/* Close btn */}
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute', top: '16px', right: '16px', zIndex: 10,
+            background: 'rgba(0,0,0,0.5)', border: '1px solid var(--border)',
+            color: 'var(--white-muted)', width: '36px', height: '36px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', fontSize: '1rem', transition: 'color 0.2s',
+          }}
+          onMouseEnter={e => e.currentTarget.style.color = 'var(--white)'}
+          onMouseLeave={e => e.currentTarget.style.color = 'var(--white-muted)'}
+        >✕</button>
+
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+
+          {/* Image */}
+          <div style={{
+            height: '280px', background: 'var(--black)',
+            borderBottom: '1px solid var(--border)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '5rem', overflow: 'hidden', flexShrink: 0,
+          }}>
+            {product.image_url ? (
+              <img
+                src={product.image_url}
+                alt={product.name}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                onError={e => { e.target.style.display = 'none' }}
+              />
+            ) : (
+              <span style={{ opacity: 0.4 }}>
+                {CATEGORY_LABEL[product.category]?.icon || '◈'}
+              </span>
+            )}
+          </div>
+
+          {/* Content */}
+          <div style={{ padding: '32px 36px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+            {/* Category badge */}
+            <div>
+              <span className="section-label">
+                ✦ {CATEGORY_LABEL[product.category]?.label || product.category}
+              </span>
+            </div>
+
+            {/* Name + price */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+              <h2 style={{
+                fontFamily: 'Playfair Display, serif',
+                fontSize: '1.8rem', color: 'var(--white)',
+                lineHeight: 1.2, margin: 0,
+              }}>
+                {product.name}
+              </h2>
+              <div style={{
+                fontFamily: 'Playfair Display, serif',
+                fontSize: '2rem', color: 'var(--gold)',
+                flexShrink: 0,
+              }}>
+                ${Number(product.price).toLocaleString('es-CO')}
+              </div>
+            </div>
+
+            {/* Description */}
+            {product.description && (
+              <p style={{
+                fontSize: '0.9rem', color: 'var(--white-muted)',
+                lineHeight: '1.7', margin: 0,
+                borderLeft: '2px solid var(--border)',
+                paddingLeft: '16px',
+              }}>
+                {product.description}
+              </p>
+            )}
+
+            {/* Divider */}
+            <div style={{ height: '1px', background: 'var(--border)' }} />
+
+            {/* Stock info */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {outOfStock ? (
+                <span style={{ fontSize: '0.78rem', color: '#fc8181', letterSpacing: '0.08em' }}>
+                  ✕ Producto agotado
+                </span>
+              ) : product.stock < 5 ? (
+                <span style={{ fontSize: '0.78rem', color: '#F59E0B', letterSpacing: '0.08em' }}>
+                  ⚠ Últimas {product.stock} unidades
+                </span>
+              ) : (
+                <span style={{ fontSize: '0.78rem', color: '#6ee7b7', letterSpacing: '0.08em' }}>
+                  ✓ En stock
+                </span>
+              )}
+            </div>
+
+            {/* Action */}
+            {!outOfStock && (
+              inCart ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0' }}>
+                  <button
+                    onClick={() => onUpdateQty(product.id, inCart.quantity - 1)}
+                    style={btnQty}
+                    onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--gold)'}
+                    onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
+                  >−</button>
+                  <span style={{
+                    width: '60px', textAlign: 'center',
+                    fontFamily: 'Playfair Display, serif',
+                    fontSize: '1.2rem', color: 'var(--gold)',
+                    border: '1px solid var(--border)',
+                    borderLeft: 'none', borderRight: 'none',
+                    lineHeight: '36px', height: '36px', display: 'inline-block',
+                  }}>{inCart.quantity}</span>
+                  <button
+                    onClick={() => onUpdateQty(product.id, inCart.quantity + 1)}
+                    style={btnQty}
+                    onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--gold)'}
+                    onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
+                  >+</button>
+                  <span style={{ marginLeft: '16px', fontSize: '0.78rem', color: '#6ee7b7' }}>
+                    ✓ En tu carrito
+                  </span>
+                </div>
+              ) : (
+                <button
+                  className="btn-gold"
+                  onClick={() => { onAdd(product); onClose() }}
+                  style={{ padding: '14px 32px', fontSize: '0.85rem', alignSelf: 'flex-start' }}
+                >
+                  + Agregar al carrito
+                </button>
+              )
+            )}
+
+            {/* Pay note */}
+            <div style={{ fontSize: '0.72rem', color: 'var(--white-muted)', paddingTop: '4px' }}>
+              💳 Pago presencial en caja al momento de recoger
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ─── Main Shop Component ───────────────────────────────────────────── */
 export default function Shop() {
-  const { user }                = useAuth()
-  const [products, setProducts] = useState([])
-  const [cart, setCart]         = useState([])
-  const [category, setCategory] = useState('')
-  const [loading, setLoading]   = useState(true)
-  const [cartOpen, setCartOpen] = useState(false)
-  const [ordering, setOrdering] = useState(false)
-  const [success, setSuccess]   = useState(null)
-  const [notes, setNotes]       = useState('')
-  const navigate                = useNavigate()
+  const { user }                      = useAuth()
+  const [products, setProducts]       = useState([])
+  const [cart, setCart]               = useState([])
+  const [category, setCategory]       = useState('')
+  const [loading, setLoading]         = useState(true)
+  const [cartOpen, setCartOpen]       = useState(false)
+  const [ordering, setOrdering]       = useState(false)
+  const [success, setSuccess]         = useState(null)
+  const [notes, setNotes]             = useState('')
+  const [selectedProduct, setSelectedProduct] = useState(null) // ← NEW
+  const navigate                      = useNavigate()
 
   useEffect(() => {
     api.get('/shop/products', { params: category ? { category } : {} })
@@ -96,22 +289,20 @@ export default function Shop() {
             )}
             {user?.role !== 'admin' && (
               <button
-  className="btn-gold"
-  onClick={() => setCartOpen(true)}
-  style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
->
-  🛒 Carrito
-  {totalItems > 0 && (
-    <span style={{
-      background: 'rgba(0,0,0,0.3)',
-      color: 'var(--white)',
-      width: '20px', height: '20px', borderRadius: '50%',
-      fontSize: '0.65rem', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontWeight: '700',
-      fontFamily: 'DM Sans, sans-serif',
-    }}>{totalItems}</span>
-  )}
-</button>
+                className="btn-gold"
+                onClick={() => setCartOpen(true)}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+              >
+                🛒 Carrito
+                {totalItems > 0 && (
+                  <span style={{
+                    background: 'rgba(0,0,0,0.3)', color: 'var(--white)',
+                    width: '20px', height: '20px', borderRadius: '50%',
+                    fontSize: '0.65rem', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontWeight: '700', fontFamily: 'DM Sans, sans-serif',
+                  }}>{totalItems}</span>
+                )}
+              </button>
             )}
           </div>
         </div>
@@ -160,7 +351,7 @@ export default function Shop() {
                   <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.3rem', color: 'var(--white)' }}>
                     {CATEGORY_LABEL[cat]?.label}
                   </h2>
-                  <div style={{ flex: 1, height: '1px', background: 'var(--border)' }}/>
+                  <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '2px' }}>
@@ -168,11 +359,17 @@ export default function Shop() {
                     const inCart     = cart.find(i => i.id === p.id)
                     const outOfStock = p.stock === 0
                     return (
-                      <div key={p.id} className="card-hover" style={{
-                        background: 'var(--black-card)', border: '1px solid var(--border)',
-                        padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px',
-                        opacity: outOfStock ? 0.5 : 1,
-                      }}>
+                      <div
+                        key={p.id}
+                        className="card-hover"
+                        style={{
+                          background: 'var(--black-card)', border: '1px solid var(--border)',
+                          padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px',
+                          opacity: outOfStock ? 0.5 : 1,
+                          cursor: 'pointer',        // ← indicates clickable
+                        }}
+                        onClick={() => setSelectedProduct(p)}   // ← open modal
+                      >
                         {/* Imagen */}
                         <div style={{
                           height: '160px', background: 'var(--black-soft)',
@@ -183,7 +380,7 @@ export default function Shop() {
                           {p.image_url ? (
                             <img src={p.image_url} alt={p.name}
                               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                              onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block' }}
+                              onError={e => { e.target.style.display = 'none' }}
                             />
                           ) : (
                             <span>{CATEGORY_LABEL[p.category]?.icon}</span>
@@ -196,24 +393,30 @@ export default function Shop() {
                             {p.name}
                           </div>
                           {p.description && (
-                            <div style={{ fontSize: '0.75rem', color: 'var(--white-muted)', lineHeight: '1.5' }}>{p.description}</div>
+                            <div style={{
+                              fontSize: '0.75rem', color: 'var(--white-muted)', lineHeight: '1.5',
+                              display: '-webkit-box', WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical', overflow: 'hidden',  // ← truncate to 2 lines on card
+                            }}>{p.description}</div>
                           )}
                         </div>
 
                         {/* Stock */}
                         <div style={{ fontSize: '0.68rem', color: p.stock < 5 ? '#F59E0B' : 'var(--white-muted)', letterSpacing: '0.05em' }}>
-  {outOfStock ? '✕ Agotado' : user?.role === 'admin' ? `${p.stock} disponibles` : null}
-</div>
+                          {outOfStock ? '✕ Agotado' : user?.role === 'admin' ? `${p.stock} disponibles` : null}
+                        </div>
 
                         {/* Precio y botón */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
+                        <div
+                          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}
+                          onClick={e => e.stopPropagation()}   // ← prevent card click when using qty controls
+                        >
                           <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.2rem', color: 'var(--gold)' }}>
                             ${Number(p.price).toLocaleString('es-CO')}
                           </div>
                           {user?.role === 'admin' ? null : outOfStock ? (
                             <span style={{ fontSize: '0.72rem', color: 'var(--white-muted)' }}>Agotado</span>
                           ) : inCart ? (
-                            /* ✅ Usa p.id e inCart.quantity — NO item */
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                               <button onClick={() => updateQty(p.id, inCart.quantity - 1)} style={btnQty}>−</button>
                               <span style={{
@@ -223,7 +426,11 @@ export default function Shop() {
                               <button onClick={() => updateQty(p.id, inCart.quantity + 1)} style={btnQty}>+</button>
                             </div>
                           ) : (
-                            <button className="btn-gold" onClick={() => addToCart(p)} style={{ padding: '8px 16px', fontSize: '0.72rem' }}>
+                            <button
+                              className="btn-gold"
+                              onClick={e => { e.stopPropagation(); addToCart(p) }}  // ← stopPropagation so modal doesn't open
+                              style={{ padding: '8px 16px', fontSize: '0.72rem' }}
+                            >
                               + Agregar
                             </button>
                           )}
@@ -237,6 +444,17 @@ export default function Shop() {
           </div>
         )}
       </div>
+
+      {/* ─── Product Detail Modal ─── */}
+      {selectedProduct && (
+        <ProductModal
+          product={selectedProduct}
+          cart={cart}
+          onClose={() => setSelectedProduct(null)}
+          onAdd={addToCart}
+          onUpdateQty={updateQty}
+        />
+      )}
 
       {/* Carrito lateral */}
       {cartOpen && (
@@ -277,7 +495,6 @@ export default function Shop() {
                         <div style={{ fontSize: '0.88rem', color: 'var(--white)', marginBottom: '4px' }}>{item.name}</div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--gold)' }}>${Number(item.price).toLocaleString('es-CO')} c/u</div>
                       </div>
-                      {/* ✅ Carrito lateral — usa item correctamente */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <button onClick={() => updateQty(item.id, item.quantity - 1)} style={btnQty}>−</button>
                         <span style={{
