@@ -605,7 +605,7 @@ function SectionUsers() {
     setEditForm({ name: user.name, email: user.email, phone: user.phone || '', new_password: '', specialties: '', experience_years: 0, bio: '' })
     setShowNewPassword(false)
     setImageFile(null)
-    setImagePreview(user.avatar_url ? `${BASE}${user.avatar_url}` : null)
+    setImagePreview(user.avatar_url ? user.avatar_url : null)
     setMsg('')
     if (user.role === 'barber') {
       api.get(`/barbers/${user.id}`).then(r => {
