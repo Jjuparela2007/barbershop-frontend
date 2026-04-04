@@ -115,7 +115,7 @@ function Hero() {
           <div style={{ display: 'flex', gap: '40px', marginTop: '40px', flexWrap: 'wrap' }}>
             {[
               { num: '12+', label: 'Años experiencia' },
-              { num: `${stats.barbers}+`, label: 'Barberos' },
+              { num: `${stats.barbers}`, label: 'Barberos' },
               { num: stats.services, label: 'Servicios' },
             ].map(stat => (
               <div key={stat.label}>
