@@ -132,11 +132,7 @@ function ProductModal({ product, cart, onClose, onAdd, onUpdateQty }) {
                 <span style={{ fontSize: '0.78rem', color: '#fc8181', letterSpacing: '0.08em' }}>
                   ✕ Producto agotado
                 </span>
-              ) : product.stock < 5 ? (
-                <span style={{ fontSize: '0.78rem', color: '#F59E0B', letterSpacing: '0.08em' }}>
-                  ⚠ Últimas {product.stock} unidades
-                </span>
-              ) : (
+              ) :  (
                 <span style={{ fontSize: '0.78rem', color: '#6ee7b7', letterSpacing: '0.08em' }}>
                   ✓ En stock
                 </span>
