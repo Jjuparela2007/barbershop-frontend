@@ -392,13 +392,7 @@ export default function Shop() {
                           <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1rem', color: 'var(--white)', marginBottom: '4px' }}>
                             {p.name}
                           </div>
-                          {p.description && (
-                            <div style={{
-                              fontSize: '0.75rem', color: 'var(--white-muted)', lineHeight: '1.5',
-                              display: '-webkit-box', WebkitLineClamp: 2,
-                              WebkitBoxOrient: 'vertical', overflow: 'hidden',  // ← truncate to 2 lines on card
-                            }}>{p.description}</div>
-                          )}
+                         
                         </div>
 
                         {/* Stock */}
