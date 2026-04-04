@@ -1707,7 +1707,7 @@ function SectionServices() {
     setForm({ name: svc.name, description: svc.description || '', duration_minutes: svc.duration_minutes, price: svc.price, display_order: svc.display_order || 0 })
     setMsg('')
     setImageFile(null)
-    setImagePreview(svc.image_url ? `${BASE}${svc.image_url}` : null)
+    setImagePreview(svc.image_url ? svc.image_url : null)
     setEditing(svc)
   }
 
@@ -1735,7 +1735,6 @@ function SectionServices() {
         savedId = editing.id
       }
 
-      // Subir imagen si se seleccionó una
       if (imageFile && savedId) {
         const formData = new FormData()
         formData.append('image', imageFile)
@@ -1789,9 +1788,8 @@ function SectionServices() {
             onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}>
               <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
 
-                {/* Miniatura o ícono */}
                 {svc.image_url ? (
-                  <img src={`${BASE}${svc.image_url}`} alt={svc.name} style={{
+                  <img src={svc.image_url} alt={svc.name} style={{
                     width: '44px', height: '44px', objectFit: 'cover',
                     border: '1px solid rgba(201,168,76,0.2)', flexShrink: 0,
                   }} />
@@ -1854,7 +1852,6 @@ function SectionServices() {
                 </div>
               ))}
 
-              {/* Input de imagen */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--white-muted)', marginBottom: '6px' }}>
                   Imagen del servicio
