@@ -6,7 +6,7 @@ import api from '../../services/api'
 const CATEGORY_LABEL = {
   accesorios: { label: 'Accesorios' },
   ropa:       { label: 'Ropa' },
-  barberia:   { label: 'Cuidado Personal ' },
+  barberia:   { label: 'Cuidado Personal' },
 }
 
 /* ─── Product Detail Modal ─────────────────────────────────────────── */
@@ -14,7 +14,6 @@ function ProductModal({ product, cart, onClose, onAdd, onUpdateQty }) {
   const inCart     = cart.find(i => i.id === product.id)
   const outOfStock = product.stock === 0
 
-  // Close on Escape
   useEffect(() => {
     const handler = e => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', handler)
@@ -92,14 +91,12 @@ function ProductModal({ product, cart, onClose, onAdd, onUpdateQty }) {
           {/* Content */}
           <div style={{ padding: '32px 36px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-            {/* Category badge */}
             <div>
               <span className="section-label">
                 ✦ {CATEGORY_LABEL[product.category]?.label || product.category}
               </span>
             </div>
 
-            {/* Name + price */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
               <h2 style={{
                 fontFamily: 'Playfair Display, serif',
@@ -117,7 +114,6 @@ function ProductModal({ product, cart, onClose, onAdd, onUpdateQty }) {
               </div>
             </div>
 
-            {/* Description */}
             {product.description && (
               <p style={{
                 fontSize: '0.9rem', color: 'var(--white-muted)',
@@ -129,10 +125,8 @@ function ProductModal({ product, cart, onClose, onAdd, onUpdateQty }) {
               </p>
             )}
 
-            {/* Divider */}
             <div style={{ height: '1px', background: 'var(--border)' }} />
 
-            {/* Stock info */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               {outOfStock ? (
                 <span style={{ fontSize: '0.78rem', color: '#fc8181', letterSpacing: '0.08em' }}>
@@ -149,7 +143,6 @@ function ProductModal({ product, cart, onClose, onAdd, onUpdateQty }) {
               )}
             </div>
 
-            {/* Action */}
             {!outOfStock && (
               inCart ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0' }}>
@@ -188,7 +181,6 @@ function ProductModal({ product, cart, onClose, onAdd, onUpdateQty }) {
               )
             )}
 
-            {/* Pay note */}
             <div style={{ fontSize: '0.72rem', color: 'var(--white-muted)', paddingTop: '4px' }}>
               💳 Pago presencial en caja al momento de recoger
             </div>
@@ -211,7 +203,7 @@ export default function Shop() {
   const [ordering, setOrdering]       = useState(false)
   const [success, setSuccess]         = useState(null)
   const [notes, setNotes]             = useState('')
-  const [selectedProduct, setSelectedProduct] = useState(null) // ← NEW
+  const [selectedProduct, setSelectedProduct] = useState(null)
   const navigate                      = useNavigate()
 
   useEffect(() => {
@@ -271,6 +263,75 @@ export default function Shop() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--black)', paddingTop: '80px' }}>
+
+      {/* Estilos del hover overlay */}
+      <style>{`
+        .product-card-img-wrapper {
+          position: relative;
+          height: 160px;
+          background: var(--black-soft);
+          border: 1px solid var(--border);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 3rem;
+          overflow: hidden;
+          flex-shrink: 0;
+        }
+
+        .product-card-img-wrapper .hover-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.65);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transition: opacity 0.25s ease;
+          backdrop-filter: blur(2px);
+        }
+
+        .product-card:hover .hover-overlay {
+          opacity: 1;
+        }
+
+        .hover-overlay-btn {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          padding: 9px 18px;
+          background: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.25);
+          color: #fff;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 0.75rem;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition: background 0.2s, border-color 0.2s, transform 0.2s;
+          transform: translateY(6px);
+          transition: opacity 0.25s ease, transform 0.25s ease, background 0.2s, border-color 0.2s;
+        }
+
+        .product-card:hover .hover-overlay-btn {
+          transform: translateY(0);
+        }
+
+        .hover-overlay-btn:hover {
+          background: rgba(var(--gold-rgb, 212,175,55), 0.15);
+          border-color: var(--gold);
+          color: var(--gold);
+        }
+
+        .hover-overlay-btn svg {
+          flex-shrink: 0;
+          transition: transform 0.2s;
+        }
+
+        .hover-overlay-btn:hover svg {
+          transform: scale(1.15);
+        }
+      `}</style>
 
       {/* Header */}
       <div style={{ background: 'var(--black-soft)', borderBottom: '1px solid var(--border)', padding: '24px 5%' }}>
@@ -361,22 +422,17 @@ export default function Shop() {
                     return (
                       <div
                         key={p.id}
-                        className="card-hover"
+                        className="card-hover product-card"
                         style={{
                           background: 'var(--black-card)', border: '1px solid var(--border)',
                           padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px',
                           opacity: outOfStock ? 0.5 : 1,
-                          cursor: 'pointer',        // ← indicates clickable
+                          cursor: 'pointer',
                         }}
-                        onClick={() => setSelectedProduct(p)}   // ← open modal
+                        onClick={() => setSelectedProduct(p)}
                       >
-                        {/* Imagen */}
-                        <div style={{
-                          height: '160px', background: 'var(--black-soft)',
-                          border: '1px solid var(--border)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: '3rem', overflow: 'hidden',
-                        }}>
+                        {/* Imagen con hover overlay */}
+                        <div className="product-card-img-wrapper">
                           {p.image_url ? (
                             <img src={p.image_url} alt={p.name}
                               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
@@ -385,6 +441,18 @@ export default function Shop() {
                           ) : (
                             <span>{CATEGORY_LABEL[p.category]?.icon}</span>
                           )}
+
+                          {/* Overlay de hover */}
+                          {!outOfStock && (
+                            <div className="hover-overlay">
+                              <button className="hover-overlay-btn">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                </svg>
+                                Ver producto
+                              </button>
+                            </div>
+                          )}
                         </div>
 
                         {/* Info */}
@@ -392,7 +460,6 @@ export default function Shop() {
                           <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1rem', color: 'var(--white)', marginBottom: '4px' }}>
                             {p.name}
                           </div>
-                         
                         </div>
 
                         {/* Stock */}
@@ -403,7 +470,7 @@ export default function Shop() {
                         {/* Precio y botón */}
                         <div
                           style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}
-                          onClick={e => e.stopPropagation()}   // ← prevent card click when using qty controls
+                          onClick={e => e.stopPropagation()}
                         >
                           <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.2rem', color: 'var(--gold)' }}>
                             ${Number(p.price).toLocaleString('es-CO')}
@@ -422,7 +489,7 @@ export default function Shop() {
                           ) : (
                             <button
                               className="btn-gold"
-                              onClick={e => { e.stopPropagation(); addToCart(p) }}  // ← stopPropagation so modal doesn't open
+                              onClick={e => { e.stopPropagation(); addToCart(p) }}
                               style={{ padding: '8px 16px', fontSize: '0.72rem' }}
                             >
                               + Agregar
