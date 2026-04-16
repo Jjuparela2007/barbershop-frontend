@@ -11,6 +11,7 @@ import AdminDashboard from './pages/admin/AdminDashboard'
 import BarberProfile from './pages/BarberProfile'
 import Profile from './pages/client/Profile'
 import Shop from './pages/client/Shop'
+import NotFound from './pages/NotFound'
 
 
 export default function App() {
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/register" element={<Register/>} />
         <Route path="/barber/:id" element={<BarberProfile/>}/>
         <Route path="/shop" element={<Shop/>}/>
+        
         
         <Route path="/client/profile" element={
         <ProtectedRoute roles={['client']}>
@@ -49,6 +51,7 @@ export default function App() {
             <AdminDashboard/>
           </ProtectedRoute>
           }/>
+          <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   )
