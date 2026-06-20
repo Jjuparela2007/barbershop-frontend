@@ -39,6 +39,7 @@ export default function AdminDashboard() {
     { key: 'ratings',      label: 'Calificaciones', icon: '' },
     { key: 'shop',         label: 'Tienda',         icon: '' },
     { key: 'services',     label: 'Servicios',      icon: '' },
+    { key: 'profile',      label: 'Mi Perfil',      icon: '' },
   ]
 
   return (
@@ -87,6 +88,7 @@ export default function AdminDashboard() {
         {section === 'ratings'      && <SectionRatings />}
         {section === 'shop'         && <SectionShop />}
         {section === 'services'     && <SectionServices />}
+        {section === 'profile'      && <SectionProfile />}
       </div>
     </div>
   )
@@ -1889,6 +1891,181 @@ function SectionServices() {
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+// ── Mi Perfil (cambiar correo / contraseña del admin) ───────────
+function SectionProfile() {
+  const { user, login } = useAuth()
+
+  const [emailForm, setEmailForm] = useState({
+    newEmail: user?.email || '',
+    currentPassword: '',
+  })
+  const [passForm, setPassForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  })
+
+  const [msgEmail, setMsgEmail] = useState('')
+  const [msgPass, setMsgPass]   = useState('')
+  const [savingE, setSavingE]   = useState(false)
+  const [savingP, setSavingP]   = useState(false)
+
+  const inputStyle = {
+    width: '100%', padding: '14px 16px',
+    background: 'var(--black)', border: '1px solid var(--border)',
+    color: 'var(--white)', fontSize: '0.9rem', outline: 'none',
+    fontFamily: 'DM Sans, sans-serif', boxSizing: 'border-box',
+    transition: 'border-color 0.3s',
+  }
+
+  const handleSaveEmail = async () => {
+    setMsgEmail('')
+    if (!emailForm.newEmail || !emailForm.currentPassword) {
+      setMsgEmail('✗ Completa correo y contraseña actual')
+      return
+    }
+    setSavingE(true)
+    try {
+      const { data } = await api.put('/auth/change-email', emailForm)
+      login({ ...user, email: data.data.email }, localStorage.getItem('token'))
+      setMsgEmail('✓ Correo actualizado correctamente')
+      setEmailForm({ ...emailForm, currentPassword: '' })
+    } catch (err) {
+      setMsgEmail('✗ ' + (err.response?.data?.error || 'Error al actualizar el correo'))
+    } finally { setSavingE(false) }
+  }
+
+  const handleSavePass = async () => {
+    setMsgPass('')
+    if (passForm.newPassword !== passForm.confirmPassword) {
+      setMsgPass('✗ Las contraseñas no coinciden')
+      return
+    }
+    if (passForm.newPassword.length < 6) {
+      setMsgPass('✗ La nueva contraseña debe tener al menos 6 caracteres')
+      return
+    }
+    setSavingP(true)
+    try {
+      await api.put('/auth/change-password', {
+        currentPassword: passForm.currentPassword,
+        newPassword:     passForm.newPassword,
+      })
+      setMsgPass('✓ Contraseña actualizada correctamente')
+      setPassForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
+    } catch (err) {
+      setMsgPass('✗ ' + (err.response?.data?.error || 'Error al cambiar la contraseña'))
+    } finally { setSavingP(false) }
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '560px' }}>
+      <div>
+        <span className="section-label">✦ Mi cuenta</span>
+        <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.8rem', color: 'var(--white)', margin: '8px 0 0' }}>
+          Mi Perfil
+        </h2>
+        <p style={{ fontSize: '0.8rem', color: 'var(--white-muted)', marginTop: '6px' }}>
+          Correo actual: {user?.email}
+        </p>
+      </div>
+
+      {/* Cambiar correo */}
+      <div style={{ background: 'var(--black-card)', border: '1px solid var(--border)', padding: '32px' }}>
+        <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.05rem', color: 'var(--white)', marginBottom: '20px' }}>
+          Cambiar Correo
+        </h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--white-muted)', marginBottom: '8px' }}>
+              Nuevo correo
+            </label>
+            <input
+              type="email"
+              value={emailForm.newEmail}
+              onChange={e => setEmailForm({ ...emailForm, newEmail: e.target.value })}
+              style={inputStyle}
+              onFocus={e => e.target.style.borderColor = 'var(--gold)'}
+              onBlur={e  => e.target.style.borderColor = 'var(--border)'}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--white-muted)', marginBottom: '8px' }}>
+              Contraseña actual (para confirmar)
+            </label>
+            <input
+              type="password"
+              value={emailForm.currentPassword}
+              onChange={e => setEmailForm({ ...emailForm, currentPassword: e.target.value })}
+              placeholder="••••••••"
+              style={inputStyle}
+              onFocus={e => e.target.style.borderColor = 'var(--gold)'}
+              onBlur={e  => e.target.style.borderColor = 'var(--border)'}
+            />
+          </div>
+
+          {msgEmail && (
+            <div style={{
+              padding: '10px 14px', fontSize: '0.82rem',
+              background: msgEmail.startsWith('✓') ? 'rgba(16,185,129,0.1)' : 'rgba(220,38,38,0.1)',
+              border: `1px solid ${msgEmail.startsWith('✓') ? 'rgba(16,185,129,0.3)' : 'rgba(220,38,38,0.3)'}`,
+              color: msgEmail.startsWith('✓') ? '#6ee7b7' : '#fc8181',
+            }}>{msgEmail}</div>
+          )}
+
+          <button className="btn-gold" onClick={handleSaveEmail} disabled={savingE}
+            style={{ alignSelf: 'flex-start', opacity: savingE ? 0.7 : 1 }}>
+            {savingE ? 'Guardando...' : 'Actualizar correo'}
+          </button>
+        </div>
+      </div>
+
+      {/* Cambiar contraseña */}
+      <div style={{ background: 'var(--black-card)', border: '1px solid var(--border)', padding: '32px' }}>
+        <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.05rem', color: 'var(--white)', marginBottom: '20px' }}>
+          Cambiar Contraseña
+        </h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {[
+            { key: 'currentPassword', label: 'Contraseña actual',   placeholder: '••••••••' },
+            { key: 'newPassword',     label: 'Nueva contraseña',     placeholder: 'Mínimo 6 caracteres' },
+            { key: 'confirmPassword', label: 'Confirmar contraseña', placeholder: '••••••••' },
+          ].map(f => (
+            <div key={f.key}>
+              <label style={{ display: 'block', fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--white-muted)', marginBottom: '8px' }}>
+                {f.label}
+              </label>
+              <input
+                type="password"
+                value={passForm[f.key]}
+                onChange={e => setPassForm({ ...passForm, [f.key]: e.target.value })}
+                placeholder={f.placeholder}
+                style={inputStyle}
+                onFocus={e => e.target.style.borderColor = 'var(--gold)'}
+                onBlur={e  => e.target.style.borderColor = 'var(--border)'}
+              />
+            </div>
+          ))}
+
+          {msgPass && (
+            <div style={{
+              padding: '10px 14px', fontSize: '0.82rem',
+              background: msgPass.startsWith('✓') ? 'rgba(16,185,129,0.1)' : 'rgba(220,38,38,0.1)',
+              border: `1px solid ${msgPass.startsWith('✓') ? 'rgba(16,185,129,0.3)' : 'rgba(220,38,38,0.3)'}`,
+              color: msgPass.startsWith('✓') ? '#6ee7b7' : '#fc8181',
+            }}>{msgPass}</div>
+          )}
+
+          <button className="btn-gold" onClick={handleSavePass} disabled={savingP}
+            style={{ alignSelf: 'flex-start', opacity: savingP ? 0.7 : 1 }}>
+            {savingP ? 'Actualizando...' : 'Cambiar contraseña'}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
