@@ -65,8 +65,8 @@ export default function BarberProfile() {
       backgroundImage: `url(${getFullUrl(barber.avatar_url)})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
-      filter: 'blur(30px) brightness(0.7)',
-      opacity: 0.4,
+      filter: 'blur(20px) brightness(0.8)',
+      opacity: 0.8,
       transform: 'scale(1.15)',
       zIndex: 0,
     }} />
@@ -76,7 +76,7 @@ export default function BarberProfile() {
   <div style={{
     position: 'absolute',
     inset: 0,
-    background: 'linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.55))',
+    background: 'linear-gradient(to right, rgba(0,0,0,0.6), rgba(0,0,0,0.3))',
     zIndex: 1,
   }} />
 
