@@ -1914,6 +1914,15 @@ function SectionProfile() {
   const [savingE, setSavingE]   = useState(false)
   const [savingP, setSavingP]   = useState(false)
 
+  // Visibilidad de cada campo de contraseña
+  const [show, setShow] = useState({
+    emailPass:       false,
+    currentPassword: false,
+    newPassword:     false,
+    confirmPassword: false,
+  })
+  const toggle = key => setShow(s => ({ ...s, [key]: !s[key] }))
+
   const inputStyle = {
     width: '100%', padding: '14px 16px',
     background: 'var(--black)', border: '1px solid var(--border)',
@@ -1921,6 +1930,41 @@ function SectionProfile() {
     fontFamily: 'DM Sans, sans-serif', boxSizing: 'border-box',
     transition: 'border-color 0.3s',
   }
+
+  // Estilo del input cuando lleva ojito (deja espacio a la derecha)
+  const passInputStyle = { ...inputStyle, paddingRight: '48px' }
+
+  // Icono de ojo (SVG inline, hereda color via currentColor)
+  const EyeIcon = ({ open }) => (
+    open ? (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
+        <circle cx="12" cy="12" r="3" />
+      </svg>
+    ) : (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-6.5 0-10-7-10-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c6.5 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+        <line x1="1" y1="1" x2="23" y2="23" />
+      </svg>
+    )
+  )
+
+  // Botón ojito posicionado dentro del campo
+  const EyeButton = ({ visible, onClick }) => (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+      style={{
+        position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)',
+        background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+        color: visible ? 'var(--gold)' : 'var(--white-muted)',
+        display: 'flex', alignItems: 'center', transition: 'color 0.2s',
+      }}
+    >
+      <EyeIcon open={visible} />
+    </button>
+  )
 
   const handleSaveEmail = async () => {
     setMsgEmail('')
@@ -1997,15 +2041,18 @@ function SectionProfile() {
             <label style={{ display: 'block', fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--white-muted)', marginBottom: '8px' }}>
               Contraseña actual (para confirmar)
             </label>
-            <input
-              type="password"
-              value={emailForm.currentPassword}
-              onChange={e => setEmailForm({ ...emailForm, currentPassword: e.target.value })}
-              placeholder="••••••••"
-              style={inputStyle}
-              onFocus={e => e.target.style.borderColor = 'var(--gold)'}
-              onBlur={e  => e.target.style.borderColor = 'var(--border)'}
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                type={show.emailPass ? 'text' : 'password'}
+                value={emailForm.currentPassword}
+                onChange={e => setEmailForm({ ...emailForm, currentPassword: e.target.value })}
+                placeholder="••••••••"
+                style={passInputStyle}
+                onFocus={e => e.target.style.borderColor = 'var(--gold)'}
+                onBlur={e  => e.target.style.borderColor = 'var(--border)'}
+              />
+              <EyeButton visible={show.emailPass} onClick={() => toggle('emailPass')} />
+            </div>
           </div>
 
           {msgEmail && (
@@ -2039,15 +2086,18 @@ function SectionProfile() {
               <label style={{ display: 'block', fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--white-muted)', marginBottom: '8px' }}>
                 {f.label}
               </label>
-              <input
-                type="password"
-                value={passForm[f.key]}
-                onChange={e => setPassForm({ ...passForm, [f.key]: e.target.value })}
-                placeholder={f.placeholder}
-                style={inputStyle}
-                onFocus={e => e.target.style.borderColor = 'var(--gold)'}
-                onBlur={e  => e.target.style.borderColor = 'var(--border)'}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={show[f.key] ? 'text' : 'password'}
+                  value={passForm[f.key]}
+                  onChange={e => setPassForm({ ...passForm, [f.key]: e.target.value })}
+                  placeholder={f.placeholder}
+                  style={passInputStyle}
+                  onFocus={e => e.target.style.borderColor = 'var(--gold)'}
+                  onBlur={e  => e.target.style.borderColor = 'var(--border)'}
+                />
+                <EyeButton visible={show[f.key]} onClick={() => toggle(f.key)} />
+              </div>
             </div>
           ))}
 
