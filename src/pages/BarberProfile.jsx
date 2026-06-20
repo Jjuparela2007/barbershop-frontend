@@ -21,6 +21,14 @@ export default function BarberProfile() {
 
   const DAYS = { 1: 'Lunes', 2: 'Martes', 3: 'Miércoles', 4: 'Jueves', 5: 'Viernes', 6: 'Sábado', 7: 'Domingo' }
 
+  // Convierte rutas relativas (ej. /uploads/...) en URLs completas hacia el backend.
+  // Si la URL ya es absoluta (http/https), la deja intacta.
+  const API_BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'
+  const getFullUrl = (path) => {
+    if (!path) return path
+    return path.startsWith('http') ? path : `${API_BASE}${path}`
+  }
+
   if (loading) return (
     <div style={{ minHeight: '100vh', background: 'var(--black)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ color: 'var(--gold)', fontSize: '0.8rem', letterSpacing: '0.3em' }}>CARGANDO...</div>
@@ -54,7 +62,7 @@ export default function BarberProfile() {
     <div style={{
       position: 'absolute',
       inset: 0,
-      backgroundImage: `url(${barber.avatar_url})`,
+      backgroundImage: `url(${getFullUrl(barber.avatar_url)})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       filter: 'blur(30px) brightness(0.7)',
@@ -102,7 +110,7 @@ export default function BarberProfile() {
     {/* Imagen completa */}
     {barber.avatar_url && (
       <img
-        src={barber.avatar_url}
+        src={getFullUrl(barber.avatar_url)}
         alt={barber.name}
         style={{
           width: '100%',
@@ -193,7 +201,7 @@ export default function BarberProfile() {
           position: 'relative', aspectRatio: '1',
         }}>
           <img
-            src={img.image_url}
+            src={getFullUrl(img.image_url)}
             alt={img.caption || `Trabajo ${i + 1}`}
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
             onError={e => { e.target.src = 'https://via.placeholder.com/400x400/161616/C9A84C?text=✂' }}
