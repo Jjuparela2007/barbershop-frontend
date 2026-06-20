@@ -49,25 +49,26 @@ export default function BarberProfile() {
   overflow: 'hidden',
 }}>
 
-  {/* Fondo blur */}
-  <div style={{
-    position: 'absolute',
-    inset: 0,
-    backgroundImage: barber.avatar_url 
-      ? `url(${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${barber.avatar_url})`
-      : 'none',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    filter: 'blur(25px)',
-    transform: 'scale(1.1)',
-    zIndex: 0,
-  }} />
+  {/* Fondo blur con la imagen del barbero */}
+  {barber.avatar_url && (
+    <div style={{
+      position: 'absolute',
+      inset: 0,
+      backgroundImage: `url(${barber.avatar_url})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      filter: 'blur(30px) brightness(0.7)',
+      opacity: 0.4,
+      transform: 'scale(1.15)',
+      zIndex: 0,
+    }} />
+  )}
 
-  {/* Overlay oscuro */}
+  {/* Overlay oscuro degradado */}
   <div style={{
     position: 'absolute',
     inset: 0,
-    background: 'rgba(0,0,0,0.6)',
+    background: 'linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.55))',
     zIndex: 1,
   }} />
 
